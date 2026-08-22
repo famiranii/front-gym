@@ -31,7 +31,7 @@ const products = [
 export default function NewArrivalsSection() {
   return (
     <section className="py-10 px-6 bg-muted/30">
-      <div className="flex justify-between items-center mb-8 flex-row-reverse">
+      <div className="flex justify-between items-center mb-8 ">
         <h2 className="text-xl font-semibold text-foreground">تازه‌های فروشگاه</h2>
         <Link
           href="#"
@@ -42,7 +42,7 @@ export default function NewArrivalsSection() {
         </Link>
       </div>
 
-      <div className="flex overflow-x-auto gap-5 pb-6 scrollbar-hide flex-row-reverse">
+      <div className="flex overflow-x-auto gap-5 pb-6 scrollbar-hide ">
         {products.map((product) => (
           <ProductCard key={product.id} {...product} />
         ))}

@@ -13,7 +13,7 @@ import Image from "next/image";
 import Cookies from "js-cookie";
 
 const loginSchema = z.object({
-  mobile: z.string().regex(/^09[0-9]{9}$/, "شماره موبایل معتبر نیست"),
+  phone: z.string().regex(/^09[0-9]{9}$/, "شماره موبایل معتبر نیست"),
   password: z.string().min(8, "رمز عبور باید حداقل ۸ کاراکتر باشد"),
 });
 
@@ -33,12 +33,24 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginSchema) => {
     try {
-      const res = await api.post<{ token: string; id: number }>("/login", {
-        mobile: data.mobile,
+      const res = await api.post<{
+        session_id: string;
+        access_token: string;
+        refresh_token: string;
+        access_token_expires_at: string;
+        refresh_token_expires_at: string;
+        user: {
+          full_name: string;
+          phone: string;
+          created_at: string;
+        };
+      }>("/login", {
+        phone: data.phone,
         password: data.password,
       });
-      Cookies.set("token", res.token, { expires: 7 });
-      Cookies.set("id", res.id.toString(), { expires: 7 });
+
+      Cookies.set("access_token", res.access_token, { expires: 7 });
+      Cookies.set("refresh_token", res.refresh_token, { expires: 7 });
       router.push("/");
     } catch {
       setError("root", { message: "شماره موبایل یا رمز عبور اشتباه است" });
@@ -76,12 +88,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <PrimaryInput
-            {...register("mobile")}
+            {...register("phone")}
             type="tel"
             dir="ltr"
             placeholder="شماره موبایل"
             icon="smartphone"
-            error={errors.mobile?.message}
+            error={errors.phone?.message}
             inputClassName={darkInput}
           />
 

@@ -25,8 +25,8 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterSchema) => {
     try {
       await api.post("/register", {
-        fullName: data.fullName,
-        mobile: data.mobile,
+        full_name: data.full_name,
+        phone: data.phone,
         password: data.password,
       });
       router.push("/login");
@@ -72,20 +72,20 @@ export default function RegisterPage() {
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           <PrimaryInput
-            {...register("fullName")}
+            {...register("full_name")}
             placeholder="نام و نام خانوادگی"
             icon="person"
-            error={errors.fullName?.message}
+            error={errors.full_name?.message}
             inputClassName="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-white/40 focus:ring-white/20"
           />
 
           <PrimaryInput
-            {...register("mobile")}
+            {...register("phone")}
             type="tel"
             dir="ltr"
             placeholder="شماره موبایل"
             icon="smartphone"
-            error={errors.mobile?.message}
+            error={errors.phone?.message}
             inputClassName="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-white/40 focus:ring-white/20"
           />
 

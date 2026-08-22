@@ -46,7 +46,7 @@ export default function ProductCard({
           <h3 className="text-sm font-semibold text-foreground mb-2">{name}</h3>
         </div>
 
-        <div className="flex justify-between items-center mt-4 flex-row-reverse">
+        <div className="flex justify-between items-center mt-4 ">
           <span className="text-sm text-foreground">{price}</span>
           <button className="w-8 h-8 rounded-full border border-border flex items-center justify-center group-hover:bg-secondary group-hover:text-secondary-foreground group-hover:border-secondary transition-colors">
             <span className="material-symbols-outlined text-[18px]">add</span>

@@ -9,11 +9,11 @@ const categories = [
 export default function CategoriesSection() {
   return (
     <section className="py-10 px-6">
-      <h2 className="text-xl font-semibold text-foreground mb-8 text-right">
+      <h2 className="text-xl font-semibold text-foreground mb-8">
         دسته‌بندی‌های محبوب
       </h2>
 
-      <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide flex-row-reverse">
+      <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide ">
         {categories.map((cat) => (
           <CategoryItem key={cat.label} {...cat} />
         ))}

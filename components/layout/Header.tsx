@@ -11,7 +11,7 @@ export default function Header() {
   return (
     <>
       {/* Desktop Header */}
-      <header className="hidden md:flex bg-card text-foreground sticky top-0 shadow-sm flex-row-reverse justify-between items-center px-6 py-3 w-full z-40">
+      <header className="hidden md:flex bg-card text-foreground sticky top-0 shadow-sm  justify-between items-center px-6 py-3 w-full z-40">
         <button className="p-2 rounded-full hover:bg-muted transition-colors active:scale-95 duration-200">
           <span className="material-symbols-outlined">menu</span>
         </button>
@@ -40,8 +40,8 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile Header */}
-      <header className="md:hidden bg-card text-foreground sticky top-0 shadow-sm flex flex-row-reverse justify-between items-center px-4 py-3 w-full z-40">
+      {/* phone Header */}
+      <header className="md:hidden bg-card text-foreground sticky top-0 shadow-sm flex  justify-between items-center px-4 py-3 w-full z-40">
         <button className="p-2 rounded-full hover:bg-muted transition-colors active:scale-95 duration-200">
           <span className="material-symbols-outlined">menu</span>
         </button>

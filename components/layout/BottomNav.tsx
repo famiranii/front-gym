@@ -13,7 +13,7 @@ export default function BottomNav() {
   const [active, setActive] = useState(0);
 
   return (
-    <nav className="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-card border-t border-border shadow-[0_-4px_12px_rgba(26,26,26,0.06)] flex flex-row-reverse justify-around items-center h-20 px-4">
+    <nav className="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-card border-t border-border shadow-[0_-4px_12px_rgba(26,26,26,0.06)] flex  justify-around items-center h-20 px-4">
       {navItems.map((item, i) => (
         <button
           key={item.label}
