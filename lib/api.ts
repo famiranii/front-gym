@@ -1,8 +1,9 @@
-import Cookies from "js-cookie";
-
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const getToken = () => Cookies.get("token") ?? null;
+const getToken = () => {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("token");
+};
 
 async function request<T>(
   endpoint: string,
@@ -29,25 +30,36 @@ async function request<T>(
   return res.json();
 }
 
-export const setToken = (token: string) =>
-  Cookies.set("token", token, { expires: 7 });
+export const setToken = (token: string) => {
+  localStorage.setItem("token", token);
+};
 
-export const removeToken = () => Cookies.remove("token");
+export const removeToken = () => {
+  localStorage.removeItem("token");
+};
 
 export const api = {
-  get: <T>(url: string) => request<T>(url, { method: "GET" }),
+  get: <T>(url: string) =>
+    request<T>(url, { method: "GET" }),
 
-  post: <T>(url: string, data?: Record<string, unknown> | FormData) =>
+  post: <T>(
+    url: string,
+    data?: Record<string, unknown> | FormData,
+  ) =>
     request<T>(url, {
       method: "POST",
       body: data instanceof FormData ? data : JSON.stringify(data),
     }),
 
-  put: <T>(url: string, data?: Record<string, unknown> | FormData) =>
+  put: <T>(
+    url: string,
+    data?: Record<string, unknown> | FormData,
+  ) =>
     request<T>(url, {
       method: "PUT",
       body: data instanceof FormData ? data : JSON.stringify(data),
     }),
 
-  delete: <T>(url: string) => request<T>(url, { method: "DELETE" }),
+  delete: <T>(url: string) =>
+    request<T>(url, { method: "DELETE" }),
 };

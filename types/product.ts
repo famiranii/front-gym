@@ -1,16 +1,28 @@
 // types/product.ts
+export type Product = {
+  id: string;
+  name: string;
+  price: number;
+  discount: number;
+  category_name: string;
+  primary_image: string | null;
+  is_active: boolean;
+  created_at: string;
+};
+export type VariantFormData = {
+  label: string;
+  color: string;
+  stock: number;
+};
 
 export type ProductFormData = {
   name: string;
-  category: string;
-  brand: string;
-  price: string;
-  discount: string;
-  sku: string;
-  stock: string;
   description: string;
-  selectedSizes: string[];
-  selectedColors: string[];
+  price: number;
+  discount: number;
+  category_id: string;
+  is_active: boolean;
+  variants: VariantFormData[];
 };
 
 export type SelectOption = {
@@ -58,7 +70,6 @@ export const BRANDS: SelectOption[] = [
 
 // src/types/product.ts
 
-export const SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 
 export const COLORS = [
   {
@@ -103,18 +114,5 @@ export const COLORS = [
   },
 ] as const;
 
-export type ProductSize = (typeof SIZES)[number];
 
 export type ProductColor = (typeof COLORS)[number]["value"];
-
-export interface Product {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  sizes: ProductSize[];
-  colors: ProductColor[];
-  images?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}

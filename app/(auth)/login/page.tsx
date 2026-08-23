@@ -48,9 +48,8 @@ export default function LoginPage() {
         phone: data.phone,
         password: data.password,
       });
-
-      Cookies.set("access_token", res.access_token, { expires: 7 });
-      Cookies.set("refresh_token", res.refresh_token, { expires: 7 });
+      localStorage.setItem("session_id", res.session_id);
+      localStorage.setItem("token", res.access_token);
       router.push("/");
     } catch {
       setError("root", { message: "شماره موبایل یا رمز عبور اشتباه است" });
