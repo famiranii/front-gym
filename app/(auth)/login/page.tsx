@@ -10,7 +10,6 @@ import Link from "next/link";
 import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Cookies from "js-cookie";
 
 const loginSchema = z.object({
   phone: z.string().regex(/^09[0-9]{9}$/, "شماره موبایل معتبر نیست"),
