@@ -51,11 +51,10 @@ function Slot({ isMain = false, image, onChange }: SlotProps) {
         </span>
       ) : image ? (
         <>
-          <Image
+          <img
             src={`${process.env.NEXT_PUBLIC_API_URL}${image}`}
             alt="تصویر"
-            fill
-            className="object-cover"
+            className="object-cover w-full h-full"
           />
           <button
             onClick={remove}

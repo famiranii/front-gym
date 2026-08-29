@@ -1,21 +1,28 @@
-const categories = [
-  { label: "دویدن", icon: "directions_run" },
-  { label: "بدنسازی", icon: "fitness_center" },
-  { label: "تنیس", icon: "sports_tennis" },
-  { label: "بسکتبال", icon: "sports_basketball" },
-  { label: "شنا", icon: "pool" },
-];
+import { api } from "@/lib/api";
+import { Category } from "@/types/category";
 
-export default function CategoriesSection() {
+async function getCategories(): Promise<Category[]> {
+  return api.get<Category[]>("/categories");
+}
+
+export default async function CategoriesSection() {
+  const categories = await getCategories();
+
+  console.dir(categories, { depth: null });
+
   return (
     <section className="py-10 px-6">
       <h2 className="text-xl font-semibold text-foreground mb-8">
         دسته‌بندی‌های محبوب
       </h2>
 
-      <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide ">
-        {categories.map((cat) => (
-          <CategoryItem key={cat.label} {...cat} />
+      <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide">
+        {categories.map((category) => (
+          <CategoryItem
+            key={category.id}
+            label={category.name}
+            icon="category"
+          />
         ))}
       </div>
     </section>
@@ -33,6 +40,7 @@ function CategoryItem({ label, icon }: { label: string; icon: string }) {
           {icon}
         </span>
       </div>
+
       <span className="text-xs text-muted-foreground">{label}</span>
     </div>
   );

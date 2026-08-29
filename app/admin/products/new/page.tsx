@@ -15,8 +15,8 @@ import { fetchCategories } from "@/store/slices/categorySlice";
 type ProductFormData = {
   name: string;
   description: string;
-  price: number;
-  discount: number;
+  price: number | null;
+  discount: number | null;
   category_id: string;
   is_active: boolean;
   variants: Variant[];
@@ -26,8 +26,8 @@ type ProductFormData = {
 const defaultValues: ProductFormData = {
   name: "",
   description: "",
-  price: 0,
-  discount: 0,
+  price: null,
+  discount: null,
   category_id: "",
   is_active: true,
   variants: [],
@@ -139,7 +139,7 @@ export default function AddProductForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
                 label="قیمت واحد"
-                type="number"
+                type="text"
                 dir="ltr"
                 placeholder="0"
                 suffix="تومان"
