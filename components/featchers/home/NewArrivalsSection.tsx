@@ -33,7 +33,7 @@ export default async function NewArrivalsSection() {
 
       <div className="flex overflow-x-auto gap-5 pb-6 scrollbar-hide">
         {products.map((product) => (
-          <Link href={`product/${product.id}`} key={product.id}>
+          <Link href={`products/${product.id}`} key={product.id}>
             <ProductCard product={product} />
           </Link>
         ))}
