@@ -1,4 +1,3 @@
-import Link from "next/link";
 import ProductGallery from "@/components/featchers/product/ProductGallery";
 import PurchasePanel from "@/components/featchers/product/PurchasePanel";
 import ProductTabs from "@/components/featchers/product/ProductTabs";
@@ -28,27 +27,6 @@ export default async function ProductPage({ params, searchParams }: Props) {
   return (
     <>
       <main className="min-h-screen pb-24 md:pb-10">
-        {/* Breadcrumb */}
-        <nav className="px-5 pt-5 pb-2 flex items-center gap-1 text-xs text-muted-foreground flex-wrap">
-          <Link href="/" className="hover:text-foreground transition-colors">
-            خانه
-          </Link>
-          <span className="material-symbols-outlined text-sm">
-            chevron_left
-          </span>
-          <Link
-            href="/products"
-            className="hover:text-foreground transition-colors"
-          >
-            محصولات
-          </Link>
-          <span className="material-symbols-outlined text-sm">
-            chevron_left
-          </span>
-          <span className="text-foreground font-medium truncate max-w-[180px]">
-            {product.name}
-          </span>
-        </nav>
 
         <div className="px-5 max-w-6xl mx-auto">
           {/* Hero grid */}

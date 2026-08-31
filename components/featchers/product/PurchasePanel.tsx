@@ -6,10 +6,7 @@ import StarRating from "./StarRating";
 import { Product } from "@/types/product-detail";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
-
-function formatPrice(n: number) {
-  return n.toLocaleString("fa-IR");
-}
+import PriceComponent from "@/components/ui/PriceComponent";
 
 type CartFormValues = {
   variant_id: string;
@@ -95,19 +92,21 @@ export default function PurchasePanel({ product }: { product: Product }) {
         variant_id: data.variant_id,
         quantity: data.quantity,
       });
-      console.log(res)
+
+      console.log(res);
+
       setAdded(true);
       setTimeout(() => setAdded(false), 2200);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("خطایی در افزودن محصول به سبد خرید رخ داد");
+      }
     } finally {
       setLoading(false);
     }
   };
-
-  const discount = product.originalPrice
-    ? Math.round((1 - product.price / product.originalPrice) * 100)
-    : 0;
 
   return (
     <div className="flex flex-col gap-5">
@@ -134,20 +133,11 @@ export default function PurchasePanel({ product }: { product: Product }) {
 
       {/* Price */}
       <div className="flex items-baseline gap-3">
-        <span className="text-2xl font-extrabold text-foreground">
-          {formatPrice(product.price)}
-          <span className="text-sm font-normal mr-1">تومان</span>
-        </span>
-        {product.originalPrice && (
-          <>
-            <span className="text-sm text-muted-foreground line-through">
-              {formatPrice(product.originalPrice)}
-            </span>
-            <span className="text-xs font-bold text-destructive bg-destructive/10 px-2 py-0.5 rounded-full">
-              {discount}٪ تخفیف
-            </span>
-          </>
-        )}
+        <PriceComponent
+          price={product.price}
+          final_price={product.final_price}
+          discount={product.discount}
+        />
       </div>
 
       <hr className="border-border" />

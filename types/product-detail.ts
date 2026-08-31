@@ -29,7 +29,6 @@ export interface Product {
   brand: string;
   category: string;
   price: number;
-  originalPrice?: number;
   average_rating: number;
   reviewCount: number;
   images: ProductImage[];
@@ -38,4 +37,6 @@ export interface Product {
   description: string;
   reviews: Review[];
   tags: string[];
+  final_price: number;
+  discount: number;
 }

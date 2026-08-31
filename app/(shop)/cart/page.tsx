@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import {
-  getCartApi,
-  removeFromCart,
-  updateCartQuantity,
-} from "@/store/slices/cartSlice";
+import { clearCartApi, getCartApi, removeFromCart } from "@/store/slices/cartSlice";
 import { CartItmeType } from "@/types/cartTypes";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import CartItem from "@/components/featchers/cart/CartItem";
@@ -15,7 +11,7 @@ export default function Page() {
 
   const items = useAppSelector((state) => state.cart.items);
   const loading = useAppSelector((state) => state.cart.loading);
-  console.log(items);
+
   useEffect(() => {
     dispatch(getCartApi());
   }, [dispatch]);
@@ -29,11 +25,27 @@ export default function Page() {
     () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
     [items],
   );
+
   const totalPriceWithDiscount = useMemo(
     () =>
       items.reduce((sum, item) => sum + item.final_price * item.quantity, 0),
     [items],
   );
+  const handleClearCart = async () => {
+    const confirmed = window.confirm(
+      "آیا مطمئن هستید که می‌خواهید تمام محصولات سبد خرید را حذف کنید؟",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await dispatch(clearCartApi()).unwrap();
+
+      // toast.success("سبد خرید با موفقیت خالی شد");
+    } catch (error) {
+      // toast.error(String(error));
+    }
+  };
 
   if (loading) {
     return (
@@ -47,12 +59,29 @@ export default function Page() {
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-extrabold text-foreground">سبد خرید</h1>
+      {/* Header */}
+      <div className="mb-8 flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-foreground">سبد خرید</h1>
 
-        <p className="mt-1 text-sm text-muted-foreground">
-          {totalItems} کالا در سبد خرید شما
-        </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {totalItems.toLocaleString("fa-IR")} کالا در سبد خرید شما
+          </p>
+        </div>
+
+        {items.length > 0 && (
+          <button
+            type="button"
+            onClick={handleClearCart}
+            className="group flex items-center gap-2 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-2.5 text-sm font-bold text-destructive transition-all hover:border-destructive/30 hover:bg-destructive/10 active:scale-[0.97]"
+          >
+            <span className="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110">
+              delete_sweep
+            </span>
+
+            <span>حذف همه</span>
+          </button>
+        )}
       </div>
 
       {items.length === 0 ? (
@@ -98,6 +127,7 @@ export default function Page() {
                   {totalPrice.toLocaleString("fa-IR")} تومان
                 </span>
               </div>
+
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
                   قیمت کالاها بعد از تخفیف

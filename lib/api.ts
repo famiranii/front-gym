@@ -2,6 +2,7 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const getToken = () => {
   if (typeof window === "undefined") return null;
+
   return localStorage.getItem("token");
 };
 
@@ -27,9 +28,13 @@ async function request<T>(
     throw new Error(error.message || "Request failed");
   }
 
+  // برای PATCH/DELETE که 204 می‌دهند
+  if (res.status === 204) {
+    return undefined as T;
+  }
+
   return res.json();
 }
-
 export const setToken = (token: string) => {
   localStorage.setItem("token", token);
 };

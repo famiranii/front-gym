@@ -1,5 +1,9 @@
+import PriceComponent from "@/components/ui/PriceComponent";
 import { useAppDispatch } from "@/store/hook";
-import { removeFromCart, updateCartQuantity } from "@/store/slices/cartSlice";
+import {
+  removeCartItemApi,
+  updateCartQuantityApi,
+} from "@/store/slices/cartSlice";
 import { CartItmeType } from "@/types/cartTypes";
 
 export default function CartItem({ item }: { item: CartItmeType }) {
@@ -7,7 +11,7 @@ export default function CartItem({ item }: { item: CartItmeType }) {
   const dispatch = useAppDispatch();
   const handleIncrease = (id: string, quantity: number) => {
     dispatch(
-      updateCartQuantity({
+      updateCartQuantityApi({
         id,
         quantity: quantity + 1,
       }),
@@ -18,7 +22,7 @@ export default function CartItem({ item }: { item: CartItmeType }) {
     if (quantity <= 1) return;
 
     dispatch(
-      updateCartQuantity({
+      updateCartQuantityApi({
         id,
         quantity: quantity - 1,
       }),
@@ -26,7 +30,7 @@ export default function CartItem({ item }: { item: CartItmeType }) {
   };
 
   const handleRemove = (id: string) => {
-    dispatch(removeFromCart(id));
+    dispatch(removeCartItemApi(id));
   };
 
   return (
@@ -112,29 +116,11 @@ export default function CartItem({ item }: { item: CartItmeType }) {
           </div>
 
           {/* Price */}
-          <div className="text-left flex flex-col items-end gap-0.5">
-            {/* قیمت نهایی */}
-            <div className="flex items-baseline gap-1">
-              <span className="text-base font-extrabold text-foreground">
-                {item.final_price.toLocaleString("fa-IR")}
-              </span>
-
-              <span className="text-xs text-muted-foreground">تومان</span>
-            </div>
-
-            {/* قیمت قبل از تخفیف */}
-            {item.discount > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground line-through">
-                  {item.price.toLocaleString("fa-IR")}
-                </span>
-
-                <span className="rounded-full bg-destructive/10 px-1.5 py-0.5 text-[10px] font-bold text-destructive">
-                  {item.discount}٪
-                </span>
-              </div>
-            )}
-          </div>
+          <PriceComponent
+            price={item.price}
+            final_price={item.final_price}
+            discount={item.discount}
+          />
         </div>
       </div>
     </div>
