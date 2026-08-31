@@ -6,17 +6,15 @@ export interface ProductVariant {
   color: string;
   stock: number;
   label: string;
+  id: string;
 }
 
 export interface Review {
   id: string;
-  author: string;
-  avatar: string;
+  full_name: string;
   rating: number;
-  date: string;
-  title: string;
+  created_at: string;
   body: string;
-  verified: boolean;
 }
 
 export interface ProductSpec {
@@ -32,7 +30,7 @@ export interface Product {
   category: string;
   price: number;
   originalPrice?: number;
-  rating: number;
+  average_rating: number;
   reviewCount: number;
   images: ProductImage[];
   variants: ProductVariant[];

@@ -58,13 +58,16 @@ export default function Header() {
 
 function CartButton({ count }: { count: number }) {
   return (
-    <button className="relative p-2 rounded-full hover:bg-muted transition-colors active:scale-95 duration-200">
+    <Link
+      href={"/cart"}
+      className="relative p-2 rounded-full hover:bg-muted transition-colors active:scale-95 duration-200"
+    >
       <span className="material-symbols-outlined">shopping_bag</span>
       {count > 0 && (
         <span className="absolute top-1 right-1 bg-secondary text-secondary-foreground text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
           {count}
         </span>
       )}
-    </button>
+    </Link>
   );
 }

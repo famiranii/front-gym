@@ -8,7 +8,7 @@ import PasswordInput from "@/components/ui/PasswordInput";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import Link from "next/link";
 import { api } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 const loginSchema = z.object({
@@ -19,6 +19,9 @@ const loginSchema = z.object({
 type LoginSchema = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+
+  const redirect = searchParams.get("redirect");
   const router = useRouter();
 
   const {
@@ -39,6 +42,7 @@ export default function LoginPage() {
         access_token_expires_at: string;
         refresh_token_expires_at: string;
         user: {
+          id: string;
           full_name: string;
           phone: string;
           created_at: string;
@@ -49,7 +53,17 @@ export default function LoginPage() {
       });
       localStorage.setItem("session_id", res.session_id);
       localStorage.setItem("token", res.access_token);
-      router.push("/");
+      localStorage.setItem("id", res.user.id);
+      if (
+        redirect &&
+        redirect.startsWith("/") &&
+        !redirect.startsWith("/register") &&
+        !redirect.startsWith("/login")
+      ) {
+        router.replace(redirect);
+      } else {
+        router.replace("/");
+      }
     } catch {
       setError("root", { message: "شماره موبایل یا رمز عبور اشتباه است" });
     }

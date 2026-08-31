@@ -1,25 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StarRating from "./StarRating";
+import { useParams, useRouter } from "next/navigation";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import Link from "next/link";
+import { api } from "@/lib/api";
 
-export default function ReviewForm({ onClose }: { onClose: () => void }) {
+export default function ReviewForm({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess?: () => void;
+}) {
+  const params = useParams();
+  const productId = params.slug;
   const [rating, setRating] = useState(0);
-  const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = () => {
+  const token = localStorage.getItem("token");
+  const user_id = localStorage.getItem("id");
+  const currentPath = window.location.pathname + window.location.search;
+
+  if (!token) {
+    return (
+      <Link href={`/login?redirect=${encodeURIComponent(currentPath)}`}>
+        <PrimaryButton>باید وارد شوید</PrimaryButton>
+      </Link>
+    );
+  }
+
+  const handleSubmit = async () => {
     if (!rating || !body.trim()) return;
-    setSubmitted(true);
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await api.post(`/products/${productId}/reviews`, {
+        user_id,
+        rating,
+        body,
+      });
+      setSubmitted(true);
+      onSuccess?.();
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
     return (
       <div className="flex flex-col items-center gap-3 py-8 text-center">
-        <span className="material-symbols-outlined text-4xl text-success">check_circle</span>
+        <span className="material-symbols-outlined text-4xl text-success">
+          check_circle
+        </span>
         <p className="font-bold text-foreground">نظر شما ثبت شد</p>
-        <p className="text-sm text-muted-foreground">پس از تأیید، نمایش داده می‌شود</p>
         <button
           onClick={onClose}
           className="mt-2 text-sm font-semibold text-accent hover:underline"
@@ -36,24 +78,20 @@ export default function ReviewForm({ onClose }: { onClose: () => void }) {
   return (
     <div className="flex flex-col gap-4 p-4 rounded-2xl bg-muted/40 border border-border animate-fade-in-up">
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-muted-foreground">امتیاز شما</label>
-        <StarRating rating={rating} size="lg" interactive onChange={setRating} />
+        <label className="text-xs font-semibold text-muted-foreground">
+          امتیاز شما
+        </label>
+        <StarRating
+          rating={rating}
+          size="lg"
+          interactive
+          onChange={setRating}
+        />
         {rating > 0 && (
           <span className="text-xs text-muted-foreground">
             {["", "خیلی بد", "بد", "متوسط", "خوب", "عالی"][rating]}
           </span>
         )}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-muted-foreground">عنوان نظر</label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="خلاصه‌ای از تجربه شما"
-          className={inputCls}
-        />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -69,13 +107,15 @@ export default function ReviewForm({ onClose }: { onClose: () => void }) {
         />
       </div>
 
+      {error && <p className="text-xs text-destructive">{error}</p>}
+
       <div className="flex gap-3">
         <button
           onClick={handleSubmit}
-          disabled={!rating || !body.trim()}
+          disabled={!rating || !body.trim() || loading}
           className="flex-1 py-3 rounded-xl bg-secondary text-secondary-foreground text-sm font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          ارسال نظر
+          {loading ? "در حال ارسال..." : "ارسال نظر"}
         </button>
         <button
           onClick={onClose}

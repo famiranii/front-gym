@@ -39,27 +39,25 @@ export const removeToken = () => {
 };
 
 export const api = {
-  get: <T>(url: string) =>
-    request<T>(url, { method: "GET" }),
+  get: <T>(url: string) => request<T>(url, { method: "GET" }),
 
-  post: <T>(
-    url: string,
-    data?: Record<string, unknown> | FormData,
-  ) =>
+  post: <T>(url: string, data?: Record<string, unknown> | FormData) =>
     request<T>(url, {
       method: "POST",
       body: data instanceof FormData ? data : JSON.stringify(data),
     }),
 
-  put: <T>(
-    url: string,
-    data?: Record<string, unknown> | FormData,
-  ) =>
+  put: <T>(url: string, data?: Record<string, unknown> | FormData) =>
     request<T>(url, {
       method: "PUT",
       body: data instanceof FormData ? data : JSON.stringify(data),
     }),
 
-  delete: <T>(url: string) =>
-    request<T>(url, { method: "DELETE" }),
+  patch: <T>(url: string, data?: Record<string, unknown> | FormData) =>
+    request<T>(url, {
+      method: "PATCH",
+      body: data instanceof FormData ? data : JSON.stringify(data),
+    }),
+
+  delete: <T>(url: string) => request<T>(url, { method: "DELETE" }),
 };

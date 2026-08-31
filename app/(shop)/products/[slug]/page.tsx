@@ -12,9 +12,11 @@ export function generateStaticParams() {
 }
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const { tab } = await searchParams;
   let product: Product;
   try {
     product = await api.get<Product>(`/products/${slug}`);
@@ -69,7 +71,7 @@ export default async function ProductPage({ params }: Props) {
 
           {/* Tabs */}
           <div className="bg-card rounded-2xl border border-border p-5 shadow-sm">
-            <ProductTabs product={product} />
+            <ProductTabs product={product} activeTab={tab} />
           </div>
         </div>
       </main>
