@@ -7,6 +7,7 @@ import { Product } from "@/types/product-detail";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import PriceComponent from "@/components/ui/PriceComponent";
+import QuantityBtns from "@/components/ui/QuantityBtns";
 
 type CartFormValues = {
   variant_id: string;
@@ -221,45 +222,11 @@ export default function PurchasePanel({ product }: { product: Product }) {
       </div>
 
       {/* Quantity */}
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-semibold text-muted-foreground">
-          تعداد
-        </span>
-        <div className="flex items-center gap-0 border border-border rounded-xl overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setValue("quantity", Math.max(1, qty - 1))}
-            disabled={qty <= 1}
-            className="px-3 py-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-lg font-bold disabled:opacity-40"
-          >
-            −
-          </button>
-          <span className="px-4 py-2 text-sm font-bold text-foreground border-x border-border min-w-[2.5rem] text-center">
-            {qty}
-          </span>
-          <button
-            type="button"
-            onClick={() =>
-              setValue(
-                "quantity",
-                Math.min(selectedVariant?.stock ?? qty + 1, qty + 1),
-              )
-            }
-            disabled={!!selectedVariant && qty >= selectedVariant.stock}
-            className="px-3 py-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors text-lg font-bold disabled:opacity-40"
-          >
-            +
-          </button>
-        </div>
-        {selectedVariant &&
-          selectedVariant.stock > 0 &&
-          selectedVariant.stock <= 5 && (
-            <span className="text-xs text-warning font-semibold">
-              فقط {selectedVariant.stock} عدد باقی‌مانده
-            </span>
-          )}
-      </div>
-
+      <QuantityBtns
+        quantity={qty}
+        stock={selectedVariant?.stock}
+        onChange={(value) => setValue("quantity", value)}
+      />
       {error && <p className="text-xs text-destructive">{error}</p>}
 
       {/* CTA */}

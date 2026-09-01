@@ -1,9 +1,9 @@
 import { api } from "@/lib/api";
-import { CartItmeType } from "@/types/cartTypes";
+import { CartItemType } from "@/types/cartTypes";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type CartState = {
-  items: CartItmeType[];
+  items: CartItemType[];
   loading: boolean;
   error: string | null;
 };
@@ -15,12 +15,12 @@ const initialState: CartState = {
 };
 
 export const getCartApi = createAsyncThunk<
-  CartItmeType[],
+  CartItemType[],
   void,
   { rejectValue: string }
 >("cart/getCart", async (_, { rejectWithValue }) => {
   try {
-    const response = await api.get<CartItmeType[]>("/cart");
+    const response = await api.get<CartItemType[]>("/cart");
     return response;
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -87,7 +87,7 @@ const cartSlice = createSlice({
       state.items = [];
     },
 
-    setCartItems: (state, action: PayloadAction<CartItmeType[]>) => {
+    setCartItems: (state, action: PayloadAction<CartItemType[]>) => {
       state.items = action.payload;
     },
 

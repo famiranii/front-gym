@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { clearCartApi, getCartApi, removeFromCart } from "@/store/slices/cartSlice";
-import { CartItmeType } from "@/types/cartTypes";
+import {
+  clearCartApi,
+  getCartApi,
+  removeFromCart,
+} from "@/store/slices/cartSlice";
+import { CartItemType } from "@/types/cartTypes";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import CartItem from "@/components/featchers/cart/CartItem";
+import PrimaryButton from "@/components/ui/PrimaryButton";
+import Link from "next/link";
 
 export default function Page() {
   const dispatch = useAppDispatch();
@@ -102,7 +108,7 @@ export default function Page() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Products */}
           <div className="space-y-3 lg:col-span-2">
-            {items.map((item: CartItmeType) => (
+            {items.map((item: CartItemType) => (
               <CartItem key={item.id} item={item} />
             ))}
           </div>
@@ -150,15 +156,14 @@ export default function Page() {
               </div>
             </div>
 
-            <button
-              type="button"
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-secondary py-3.5 font-bold text-secondary-foreground transition hover:opacity-90 active:scale-[0.98]"
-            >
-              <span className="material-symbols-outlined">
-                shopping_cart_checkout
-              </span>
-              ادامه و پرداخت
-            </button>
+            <Link className="mt-4" href={"/checkout"}>
+              <PrimaryButton>
+                <div className="material-symbols-outlined p-0 m-0">
+                  shopping_cart_checkout
+                </div>
+                <p> ادامه و پرداخت</p>
+              </PrimaryButton>
+            </Link>
           </div>
         </div>
       )}

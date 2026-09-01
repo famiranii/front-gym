@@ -1,12 +1,13 @@
 import PriceComponent from "@/components/ui/PriceComponent";
+import QuantityBtns from "@/components/ui/QuantityBtns";
 import { useAppDispatch } from "@/store/hook";
 import {
   removeCartItemApi,
   updateCartQuantityApi,
 } from "@/store/slices/cartSlice";
-import { CartItmeType } from "@/types/cartTypes";
+import { CartItemType } from "@/types/cartTypes";
 
-export default function CartItem({ item }: { item: CartItmeType }) {
+export default function CartItem({ item }: { item: CartItemType }) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const dispatch = useAppDispatch();
   const handleIncrease = (id: string, quantity: number) => {
@@ -92,29 +93,18 @@ export default function CartItem({ item }: { item: CartItmeType }) {
 
         <div className="mt-auto flex items-end justify-between gap-3 pt-4">
           {/* Quantity */}
-          <div className="flex items-center overflow-hidden rounded-xl border border-border">
-            <button
-              type="button"
-              onClick={() => handleDecrease(item.id, item.quantity)}
-              disabled={item.quantity <= 1}
-              className="flex h-9 w-9 items-center justify-center text-muted-foreground transition hover:bg-muted disabled:opacity-30"
-            >
-              <span className="material-symbols-outlined text-lg">remove</span>
-            </button>
-
-            <span className="flex h-9 min-w-10 items-center justify-center border-x border-border px-2 text-sm font-bold">
-              {item.quantity}
-            </span>
-
-            <button
-              type="button"
-              onClick={() => handleIncrease(item.id, item.quantity)}
-              className="flex h-9 w-9 items-center justify-center text-muted-foreground transition hover:bg-muted"
-            >
-              <span className="material-symbols-outlined text-lg">add</span>
-            </button>
-          </div>
-
+          <QuantityBtns
+            quantity={item.quantity}
+            stock={item.stock}
+            onChange={(value) =>
+              dispatch(
+                updateCartQuantityApi({
+                  id: item.id,
+                  quantity: value,
+                }),
+              )
+            }
+          />
           {/* Price */}
           <PriceComponent
             price={item.price}
