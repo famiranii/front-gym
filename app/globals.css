@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tailwindcss";
 @import "material-symbols";
-
+@import "leaflet/dist/leaflet.css";
 :root {
   /* Base */
   --background: #f0efd5;
@@ -128,3 +128,4 @@ button:focus:not(:focus-visible) {
 button {
   cursor: pointer;
 }
+

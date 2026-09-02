@@ -8,6 +8,9 @@ import CartStepper from "./CartStepper";
 import AddressList from "./AddressList";
 import { CartItemType, CartSummary } from "@/types/cartTypes";
 import OrderSummary from "./OrderSummary";
+import { api } from "@/lib/api";
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { fetchAddresses } from "@/store/slices/addressSlice";
 
 function calcSummary(items: CartItemType[]): CartSummary {
   let total = 0;
@@ -31,35 +34,37 @@ type Props = {
 };
 
 export default function CheckoutContent({ token, userId }: Props) {
+  const dispatch = useAppDispatch();
+  const addresses = useAppSelector((state) => state.address.addresses);
   const [items, setItems] = useState<CartItemType[]>([]);
-  const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddress, setSelectedAddress] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!userId) return;
+
     const fetchData = async () => {
-      const [cartRes, addrRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}/addresses`, {
-          headers: { Authorization: `Bearer ${token}` },
-        }),
-      ]);
+      try {
+        const [cartRes] = await Promise.all([api.get<CartItemType[]>("/cart")]);
+        dispatch(fetchAddresses(userId));
+        console.log(cartRes);
 
-      if (cartRes.ok) setItems(await cartRes.json());
-      if (addrRes.ok) {
-        const addrs: Address[] = await addrRes.json();
-        setAddresses(addrs);
-        const def = addrs.find((a) => a.is_default) ?? addrs[0];
-        if (def) setSelectedAddress(def.id);
+        setItems(cartRes);
+
+        const def = addresses.find((a) => a.is_default) ?? addresses[0];
+
+        if (def) {
+          setSelectedAddress(def.id);
+        }
+      } catch (error) {
+        console.error("Error fetching cart and addresses:", error);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchData();
-  }, [token, userId]);
+  }, [userId]);
 
   if (loading) {
     return (
@@ -81,6 +86,7 @@ export default function CheckoutContent({ token, userId }: Props) {
           addresses={addresses}
           selectedId={selectedAddress}
           onSelect={setSelectedAddress}
+          id={userId}
         />
       </div>
 

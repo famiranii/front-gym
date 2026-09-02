@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import { useEffect } from "react";
 import { fetchCategories } from "@/store/slices/categorySlice";
+import InputCard from "@/components/ui/InputCard";
 
 type ProductFormData = {
   name: string;
@@ -34,22 +35,7 @@ const defaultValues: ProductFormData = {
   images: null,
 };
 
-function Card({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="bg-card rounded-2xl p-5 border border-border shadow-sm flex flex-col gap-4 animate-fade-in-up">
-      <h2 className="text-sm font-bold text-foreground border-b border-border pb-3">
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
-}
+
 
 export default function AddProductForm() {
   const router = useRouter();
@@ -114,7 +100,7 @@ export default function AddProductForm() {
 
       <div className="p-5 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-8 flex flex-col gap-5">
-          <Card title="اطلاعات عمومی">
+          <InputCard title="اطلاعات عمومی">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <FormInput
@@ -133,9 +119,9 @@ export default function AddProductForm() {
                 error={errors.category_id?.message}
               />
             </div>
-          </Card>
+          </InputCard>
 
-          <Card title="قیمت">
+          <InputCard title="قیمت">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormInput
                 label="قیمت واحد"
@@ -159,7 +145,7 @@ export default function AddProductForm() {
                 error={errors.discount?.message}
               />
             </div>
-          </Card>
+          </InputCard>
         </div>
 
         <div className="lg:col-span-4 flex flex-col gap-5">
@@ -191,7 +177,7 @@ export default function AddProductForm() {
         </div>
 
         <div className="lg:col-span-12">
-          <Card title="توضیحات محصول">
+          <InputCard title="توضیحات محصول">
             <FormTextarea
               label=""
               rows={6}
@@ -199,7 +185,7 @@ export default function AddProductForm() {
               {...register("description")}
               error={errors.description?.message}
             />
-          </Card>
+          </InputCard>
         </div>
       </div>
 
