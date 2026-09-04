@@ -10,25 +10,6 @@ import { CartItemType } from "@/types/cartTypes";
 export default function CartItem({ item }: { item: CartItemType }) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const dispatch = useAppDispatch();
-  const handleIncrease = (id: string, quantity: number) => {
-    dispatch(
-      updateCartQuantityApi({
-        id,
-        quantity: quantity + 1,
-      }),
-    );
-  };
-
-  const handleDecrease = (id: string, quantity: number) => {
-    if (quantity <= 1) return;
-
-    dispatch(
-      updateCartQuantityApi({
-        id,
-        quantity: quantity - 1,
-      }),
-    );
-  };
 
   const handleRemove = (id: string) => {
     dispatch(removeCartItemApi(id));

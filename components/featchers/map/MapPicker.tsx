@@ -6,6 +6,7 @@ import {
   MapContainer,
   Marker,
   TileLayer,
+  useMap,
   useMapEvents,
 } from "react-leaflet";
 
@@ -19,10 +20,7 @@ type MapPickerProps = {
   onChange: (location: Location) => void;
 };
 
-function LocationMarker({
-  value,
-  onChange,
-}: MapPickerProps) {
+function LocationMarker({ value, onChange }: MapPickerProps) {
   useMapEvents({
     click(e) {
       onChange({
@@ -34,17 +32,22 @@ function LocationMarker({
 
   if (!value) return null;
 
-  return (
-    <Marker
-      position={[value.lat, value.lng]}
-    />
-  );
+  return <Marker position={[value.lat, value.lng]} />;
 }
 
-export default function MapPicker({
-  value,
-  onChange,
-}: MapPickerProps) {
+function MapCenter({ value }: { value?: Location | null }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!value) return;
+
+    map.setView([value.lat, value.lng], map.getZoom());
+  }, [value, map]);
+
+  return null;
+}
+
+export default function MapPicker({ value, onChange }: MapPickerProps) {
   useEffect(() => {
     const defaultIcon = L.icon({
       iconUrl: "/leaflet/marker-icon.png",
@@ -72,10 +75,9 @@ export default function MapPicker({
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
 
-      <LocationMarker
-        value={value}
-        onChange={onChange}
-      />
+      <MapCenter value={value} />
+
+      <LocationMarker value={value} onChange={onChange} />
     </MapContainer>
   );
 }

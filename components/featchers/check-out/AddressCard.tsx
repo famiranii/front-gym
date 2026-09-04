@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Address } from "@/types/addressType";
 import { useAppDispatch } from "@/store/hook";
-import { deleteAddress } from "@/store/slices/addressSlice";
+import { deleteAddress,  } from "@/store/slices/addressSlice";
 
 type Props = {
   address: Address;
@@ -22,6 +22,10 @@ export default function AddressCard({
   const onDelete = async (addr_id: string) => {
     await dispatch(deleteAddress({ id, addr_id }));
   };
+
+  const handleEditIconClicked = () => {
+
+  };
   return (
     <div
       onClick={() => onSelect(address.id)}
@@ -38,7 +42,8 @@ export default function AddressCard({
         onClick={(e) => e.stopPropagation()}
       >
         <Link
-          href={`/checkout/address/${address.id}`}
+          onClick={handleEditIconClicked}
+          href={`/checkout/address?id=${address.id}`}
           className="flex items-center justify-center w-8 h-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition"
           title="ویرایش"
         >

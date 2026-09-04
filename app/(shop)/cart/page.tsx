@@ -4,7 +4,6 @@ import { useEffect, useMemo } from "react";
 import {
   clearCartApi,
   getCartApi,
-  removeFromCart,
 } from "@/store/slices/cartSlice";
 import { CartItemType } from "@/types/cartTypes";
 import { useAppDispatch, useAppSelector } from "@/store/hook";

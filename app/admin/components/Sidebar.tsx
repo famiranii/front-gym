@@ -10,6 +10,7 @@ const navItems = [
   { label: "سفارشات جدید", icon: "pending_actions", href: "/admin/orders" },
   { label: "گزارشات مالی", icon: "analytics", href: "/admin/reports" },
   { label: "تنظیمات", icon: "settings", href: "/admin/settings" },
+  { label: "دسته بندی ", icon: "folder", href: "/admin/categories" },
 ];
 
 export default function Sidebar() {
@@ -22,7 +23,7 @@ export default function Sidebar() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="fixed top-4 right-4 z-[60] md:hidden w-11 h-11 rounded-xl bg-card border border-border shadow-lg flex items-center justify-center text-foreground"
+        className="fixed top-2 right-4 z-[60] md:hidden w-11 h-11 rounded-xl bg-card border border-border shadow-lg flex items-center justify-center text-foreground"
         aria-label="باز کردن منو"
       >
         <span className="material-symbols-outlined">

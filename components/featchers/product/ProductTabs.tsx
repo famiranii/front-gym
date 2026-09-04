@@ -55,7 +55,7 @@ export default function ProductTabs({
         {TABS.map((tab) => (
           <Link
             key={tab.key}
-            href={`/products/${product.id}?tab=${tab.key}`}
+            href={`/product/${product.id}?tab=${tab.key}`}
             replace
             scroll={false}
             className={[

@@ -1,18 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import StarRating from "./StarRating";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import Link from "next/link";
 import { api } from "@/lib/api";
+import { ReviewType } from "@/types/reviewsType";
 
 export default function ReviewForm({
   onClose,
   onSuccess,
+  onAddReview,
 }: {
   onClose: () => void;
   onSuccess?: () => void;
+  onAddReview: (review: ReviewType) => void;
 }) {
   const params = useParams();
   const productId = params.slug;
@@ -41,15 +44,16 @@ export default function ReviewForm({
     setError("");
 
     try {
-      const res = await api.post(`/products/${productId}/reviews`, {
+      const res: ReviewType = await api.post(`/products/${productId}/reviews`, {
         user_id,
         rating,
         body,
       });
+      onAddReview(res);
       setSubmitted(true);
       onSuccess?.();
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError("error");
     } finally {
       setLoading(false);
     }

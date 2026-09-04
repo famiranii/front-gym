@@ -29,7 +29,7 @@ export default function ProductCard({
   return (
     <div
       data-product-id={product.id}
-      className="min-w-[280px] md:min-w-[320px] bg-card rounded-xl overflow-hidden border border-border shadow-sm group hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col"
+      className="min-w-[280px] md:min-w-[320px] h-108 bg-card rounded-xl overflow-hidden border border-border shadow-sm group hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col"
     >
       {/* Image */}
       <div className="relative h-72 bg-muted overflow-hidden">

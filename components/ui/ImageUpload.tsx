@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useRef } from "react";
-import Image from "next/image";
+import { useRef, useState } from "react";
+
 import { api } from "@/lib/api";
+
+type ProductImage = {
+  url: string;
+  is_primary: boolean;
+};
 
 interface SlotProps {
   isMain?: boolean;
   image: string | null;
-  onChange: (v: string | null) => void;
+  onChange: (value: string | null) => void;
 }
 
 function Slot({ isMain = false, image, onChange }: SlotProps) {
@@ -16,13 +21,17 @@ function Slot({ isMain = false, image, onChange }: SlotProps) {
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
     setLoading(true);
+
     try {
       const formData = new FormData();
       formData.append("image", file);
+
       const res = await api.post<{ url: string }>("/upload", formData);
+
       onChange(res.url);
     } catch {
       alert("آپلود تصویر ناموفق بود");
@@ -33,17 +42,21 @@ function Slot({ isMain = false, image, onChange }: SlotProps) {
 
   const remove = (e: React.MouseEvent) => {
     e.stopPropagation();
+
     onChange(null);
-    if (ref.current) ref.current.value = "";
+
+    if (ref.current) {
+      ref.current.value = "";
+    }
   };
 
   const base =
-    "relative bg-muted border-2 border-dashed border-border rounded-xl flex items-center justify-center cursor-pointer hover:border-accent hover:bg-primary/30 transition-all group overflow-hidden";
+    "relative flex aspect-square items-center justify-center overflow-hidden rounded-xl border-2 border-dashed border-border bg-muted transition-all hover:border-accent hover:bg-primary/30 group";
 
   return (
     <div
       onClick={() => ref.current?.click()}
-      className={isMain ? `${base} w-full aspect-square` : `${base} aspect-square`}
+      className={isMain ? `${base} w-full` : base}
     >
       {loading ? (
         <span className="material-symbols-outlined animate-spin text-muted-foreground">
@@ -53,68 +66,130 @@ function Slot({ isMain = false, image, onChange }: SlotProps) {
         <>
           <img
             src={`${process.env.NEXT_PUBLIC_API_URL}${image}`}
-            alt="تصویر"
-            className="object-cover w-full h-full"
+            alt="تصویر محصول"
+            className="h-full w-full object-cover"
           />
+
           <button
+            type="button"
             onClick={remove}
-            className="absolute top-1.5 left-1.5 bg-destructive text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            className="absolute left-1.5 top-1.5 z-10 rounded-full bg-destructive p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
           >
-            <span className="material-symbols-outlined text-sm leading-none">close</span>
+            <span className="material-symbols-outlined text-sm leading-none">
+              close
+            </span>
           </button>
         </>
       ) : isMain ? (
-        <div className="flex flex-col items-center gap-2 text-muted-foreground group-hover:text-accent transition-colors">
-          <span className="material-symbols-outlined text-4xl">add_photo_alternate</span>
+        <div className="flex flex-col items-center gap-2 text-muted-foreground transition-colors group-hover:text-accent">
+          <span className="material-symbols-outlined text-4xl">
+            add_photo_alternate
+          </span>
+
           <span className="text-sm font-semibold">آپلود تصویر اصلی</span>
+
           <span className="text-xs text-neutral">PNG, JPG تا ۵ مگابایت</span>
         </div>
       ) : (
-        <span className="material-symbols-outlined text-neutral text-xl">add</span>
+        <span className="material-symbols-outlined text-xl text-neutral">
+          add
+        </span>
       )}
-      <input ref={ref} type="file" accept="image/*" onChange={onFile} className="hidden" />
+
+      <input
+        ref={ref}
+        type="file"
+        accept="image/*"
+        onChange={onFile}
+        className="hidden"
+      />
     </div>
   );
 }
 
 interface ImageUploadProps {
-  onChange: (images: { url: string; is_primary: boolean }[]) => void;
+  value?: ProductImage[] | null;
+  onChange: (images: ProductImage[]) => void;
 }
 
-export default function ImageUpload({ onChange }: ImageUploadProps) {
-  const [main, setMain] = useState<string | null>(null);
-  const [gallery, setGallery] = useState<(string | null)[]>([null, null, null, null]);
+export default function ImageUpload({ value, onChange }: ImageUploadProps) {
+  /*
+   * value مستقیماً از react-hook-form میاد.
+   * بنابراین state جدا برای main/gallery لازم نیست.
+   */
 
-  const notify = (newMain: string | null, newGallery: (string | null)[]) => {
-    const images: { url: string; is_primary: boolean }[] = [];
-    if (newMain) images.push({ url: newMain, is_primary: true });
-    newGallery.forEach((url) => {
-      if (url) images.push({ url, is_primary: false });
+  const main = value?.find((image) => image.is_primary)?.url ?? null;
+
+  const gallery =
+    value?.filter((image) => !image.is_primary).map((image) => image.url) ?? [];
+
+  const updateMain = (url: string | null) => {
+    const nextImages = [
+      ...(url
+        ? [
+            {
+              url,
+              is_primary: true,
+            },
+          ]
+        : []),
+
+      ...gallery.map((image) => ({
+        url: image,
+        is_primary: false,
+      })),
+    ];
+
+    onChange(nextImages);
+  };
+
+  const updateGallery = (index: number, url: string | null) => {
+    const nextGallery = [...gallery];
+
+    if (url) {
+      nextGallery[index] = url;
+    } else {
+      nextGallery.splice(index, 1);
+    }
+
+    const nextImages: ProductImage[] = [];
+
+    if (main) {
+      nextImages.push({
+        url: main,
+        is_primary: true,
+      });
+    }
+
+    nextGallery.forEach((image) => {
+      if (image) {
+        nextImages.push({
+          url: image,
+          is_primary: false,
+        });
+      }
     });
-    onChange(images);
-  };
 
-  const handleMain = (v: string | null) => {
-    setMain(v);
-    notify(v, gallery);
-  };
-
-  const updateGallery = (i: number, v: string | null) => {
-    const next = gallery.map((x, idx) => (idx === i ? v : x));
-    setGallery(next);
-    notify(main, next);
+    onChange(nextImages);
   };
 
   return (
-    <section className="bg-card rounded-2xl p-5 border border-border shadow-sm flex flex-col gap-4">
+    <section className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-center justify-between border-b border-border pb-3">
         <h2 className="text-sm font-bold text-foreground">تصاویر محصول</h2>
+
         <span className="text-xs text-muted-foreground">حداکثر ۵ تصویر</span>
       </div>
-      <Slot isMain image={main} onChange={handleMain} />
+
+      <Slot isMain image={main} onChange={updateMain} />
+
       <div className="grid grid-cols-4 gap-2">
-        {gallery.map((img, i) => (
-          <Slot key={i} image={img} onChange={(v) => updateGallery(i, v)} />
+        {[0, 1, 2, 3].map((index) => (
+          <Slot
+            key={index}
+            image={gallery[index] ?? null}
+            onChange={(url) => updateGallery(index, url)}
+          />
         ))}
       </div>
     </section>

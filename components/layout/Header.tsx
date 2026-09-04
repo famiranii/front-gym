@@ -1,57 +1,31 @@
+// components/Header.tsx
 import Link from "next/link";
-
-const navLinks = [
-  { label: "خانه", href: "#", active: true },
-  { label: "فروشگاه", href: "#" },
-  { label: "سفارشات", href: "#" },
-  { label: "پروفایل", href: "#" },
-];
+import MobileHeader from "./MobileHeader";
+import BottomNav from "./header/bottomNav";
+import SearchBarWrapper from "./header/SearchBarWrapper";
 
 export default function Header() {
   return (
     <>
-      {/* Desktop Header */}
-      <header className="hidden md:flex bg-card text-foreground sticky top-0 shadow-sm  justify-between items-center px-6 py-3 w-full z-40">
-        <button className="p-2 rounded-full hover:bg-muted transition-colors active:scale-95 duration-200">
-          <span className="material-symbols-outlined">menu</span>
-        </button>
-
-        <div className="font-bold text-2xl text-foreground tracking-tighter">
-          آریا اسپرت
+      {/* Desktop */}
+      <header className="hidden md:flex items-center justify-between px-8 h-[60px] bg-card border-b border-border sticky top-0 z-40 w-full">
+        <div className="flex items-center gap-6">
+          <div className="text-lg font-bold tracking-tight text-foreground">
+            پولاد<span className="text-primary">.</span>
+          </div>
+          <SearchBarWrapper />
         </div>
 
-        <div className="flex items-center gap-4">
-          <nav className="flex gap-6 mr-8 text-sm">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className={
-                  link.active
-                    ? "text-foreground border-b-2 border-secondary pb-1"
-                    : "text-muted-foreground hover:text-foreground transition-colors pb-1"
-                }
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
+        <div className="flex items-center gap-2">
           <CartButton count={2} />
         </div>
       </header>
 
-      {/* phone Header */}
-      <header className="md:hidden bg-card text-foreground sticky top-0 shadow-sm flex  justify-between items-center px-4 py-3 w-full z-40">
-        <button className="p-2 rounded-full hover:bg-muted transition-colors active:scale-95 duration-200">
-          <span className="material-symbols-outlined">menu</span>
-        </button>
+      {/* Mobile top bar */}
+      <MobileHeader />
 
-        <div className="font-bold text-xl text-foreground tracking-tighter">
-          آریا اسپرت
-        </div>
-
-        <CartButton count={2} />
-      </header>
+      {/* Mobile bottom nav */}
+      <BottomNav />
     </>
   );
 }
@@ -59,12 +33,14 @@ export default function Header() {
 function CartButton({ count }: { count: number }) {
   return (
     <Link
-      href={"/cart"}
-      className="relative p-2 rounded-full hover:bg-muted transition-colors active:scale-95 duration-200"
+      href="/cart"
+      className="relative w-9 h-9 flex items-center justify-center rounded-md border border-border bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
     >
-      <span className="material-symbols-outlined">shopping_bag</span>
+      <span className="material-symbols-outlined text-[18px]">
+        shopping_bag
+      </span>
       {count > 0 && (
-        <span className="absolute top-1 right-1 bg-secondary text-secondary-foreground text-[10px] w-4 h-4 flex items-center justify-center rounded-full">
+        <span className="absolute -top-1.5 -left-1.5 min-w-[16px] h-4 bg-destructive text-destructive-foreground text-[10px] font-semibold rounded-full flex items-center justify-center px-1 border-2 border-card">
           {count}
         </span>
       )}

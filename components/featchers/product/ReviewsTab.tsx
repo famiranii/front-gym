@@ -1,19 +1,19 @@
-import StarRating from "./StarRating";
 import { api } from "@/lib/api";
-import { Product, Review } from "@/types/product-detail";
-import { notFound } from "next/navigation";
-import WritingReview from "./WritingReview";
+import { Product } from "@/types/product-detail";
+import { ReviewType } from "@/types/reviewsType";
+import ReviewsClient from "./ReviewsClient";
 
 export default async function ReviewsTab({ product }: { product: Product }) {
-  console.log("first");
-  let reviews: any[] = [];
+  let reviews: ReviewType[] = [];
   let dist: { star: number; count: number }[] = [];
   try {
-    const response = await api.get<any>(`/products/${product.id}/reviews`);
+    const response = await api.get<ReviewType>(
+      `/products/${product.id}/reviews`,
+    );
     reviews = Array.isArray(response) ? response : [];
     dist = [5, 4, 3, 2, 1].map((star) => ({
       star,
-      count: reviews.filter((r: any) => r.rating === star).length,
+      count: reviews.filter((r: ReviewType) => r.rating === star).length,
     }));
     console.log("REVIEWS JSON:", JSON.stringify(reviews, null, 2));
   } catch (error) {
@@ -60,46 +60,10 @@ export default async function ReviewsTab({ product }: { product: Product }) {
         </div>
       </div>
       {/* Write review button */}
-      <WritingReview />
       نظرات کاربران
       <div className="flex flex-col gap-3">
-        {reviews.map((review) => (
-          <ReviewCard key={review.id} review={review} />
-        ))}
+        <ReviewsClient reviews={reviews} />
       </div>
-    </div>
-  );
-}
-
-function ReviewCard({ review }: { review: Review }) {
-  const formattedDate = new Intl.DateTimeFormat("fa-IR", {
-    calendar: "persian",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(review.created_at));
-  return (
-    <div className="flex flex-col gap-2 p-4 rounded-2xl bg-muted/40 border border-border">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold text-foreground">
-                {review.full_name}
-              </span>
-            </div>
-            <span className="text-xs text-muted-foreground">
-              {formattedDate}
-            </span>
-          </div>
-        </div>
-        {/* <StarRating rating={review.rating} size="sm" /> */}
-      </div>
-      <p className="text-sm text-muted-foreground leading-relaxed">
-        {review.body}
-      </p>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import Header from "@/components/layout/Header";
 
 export const metadata: Metadata = {
   title: "آریا اسپرت",
@@ -14,8 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fa" dir="rtl">
-      <body className="min-h-screen flex flex-col text-right">
-        <Providers>{children}</Providers>
+      <body className="min-h-screen text-right">
+        <main className="w-full mx-auto">
+          <Providers>{children}</Providers>
+        </main>
       </body>
     </html>
   );

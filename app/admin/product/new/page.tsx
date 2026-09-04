@@ -1,17 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+
 import ImageUpload from "@/components/ui/ImageUpload";
 import AttributesPicker, { Variant } from "@/components/ui/AttributesPicker";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
 import FormTextarea from "@/components/ui/FormTextarea";
-import { api } from "@/lib/api";
-import { useAppDispatch, useAppSelector } from "@/store/hook";
-import { useEffect } from "react";
-import { fetchCategories } from "@/store/slices/categorySlice";
 import InputCard from "@/components/ui/InputCard";
+
+import { api } from "@/lib/api";
+
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { fetchCategories } from "@/store/slices/categorySlice";
 
 type ProductFormData = {
   name: string;
@@ -35,81 +38,141 @@ const defaultValues: ProductFormData = {
   images: null,
 };
 
-
-
 export default function AddProductForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const productId = searchParams.get("id");
+  const isEditMode = Boolean(productId);
+
   const dispatch = useAppDispatch();
+
   const categories = useAppSelector((state) =>
     state.categories.items.map((category) => ({
       value: category.id,
       label: category.name,
     })),
   );
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
 
   const {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
-  } = useForm<ProductFormData>({ defaultValues, mode: "onBlur" });
+  } = useForm<ProductFormData>({
+    defaultValues,
+    mode: "onBlur",
+  });
 
-  const onSubmit = async (data: ProductFormData) => {
-    await api.post("/products", data);
-    router.push("/admin/products");
-  };
+  // Fetch categories
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
+  // Fetch product when editing
+  useEffect(() => {
+    if (!productId) return;
+
+    async function getProduct() {
+      try {
+        const product = await api.get<ProductFormData>(
+          `/products/${productId}`,
+        );
+
+        reset({
+          name: product.name ?? "",
+          description: product.description ?? "",
+          price: product.price ?? null,
+          discount: product.discount ?? null,
+          category_id: product.category_id ?? "",
+          is_active: product.is_active ?? true,
+          variants: product.variants ?? [],
+          images: product.images ?? null,
+        });
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+      }
+    }
+
+    getProduct();
+  }, [productId, reset]);
+
+  async function onSubmit(data: ProductFormData) {
+    try {
+      if (isEditMode && productId) {
+        await api.put(`/products/${productId}`, data);
+      } else {
+        await api.post("/products", data);
+      }
+
+      router.push("/admin/products");
+    } catch (error) {
+      console.error("Failed to save product:", error);
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
-      <header className="flex items-center justify-between px-5 py-3.5 sticky top-0 bg-background/80 backdrop-blur-md z-30 border-b border-border">
+      {/* Header */}
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border bg-background/80 px-5 py-3.5 backdrop-blur-md">
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => router.back()}
-            className="p-2 rounded-full hover:bg-muted transition-colors text-foreground"
+            className="rounded-full p-2 text-foreground transition-colors hover:bg-muted"
           >
             <span className="material-symbols-outlined text-xl leading-none">
               arrow_forward
             </span>
           </button>
+
           <h1 className="text-base font-bold text-foreground">
-            افزودن محصول جدید
+            {isEditMode ? "ویرایش محصول" : "افزودن محصول جدید"}
           </h1>
         </div>
 
-        <div className="hidden md:flex gap-2">
+        {/* Desktop actions */}
+        <div className="hidden gap-2 md:flex">
           <button
             type="button"
             onClick={() => router.back()}
-            className="px-5 py-2 rounded-xl border border-border text-foreground hover:bg-muted transition-colors text-sm font-semibold"
+            className="rounded-xl border border-border px-5 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-muted"
           >
             انصراف
           </button>
+
           <button
             type="submit"
             disabled={isSubmitting}
-            className="px-5 py-2 rounded-xl bg-secondary text-secondary-foreground hover:opacity-90 active:scale-95 transition-all text-sm font-semibold disabled:opacity-50"
+            className="rounded-xl bg-secondary px-5 py-2 text-sm font-semibold text-secondary-foreground transition-all hover:opacity-90 active:scale-95 disabled:opacity-50"
           >
-            {isSubmitting ? "در حال ثبت..." : "ثبت محصول"}
+            {isSubmitting
+              ? "در حال ذخیره..."
+              : isEditMode
+                ? "ذخیره تغییرات"
+                : "ثبت محصول"}
           </button>
         </div>
       </header>
 
-      <div className="p-5 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-5">
-        <div className="lg:col-span-8 flex flex-col gap-5">
+      {/* Form */}
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 p-5 lg:grid-cols-12">
+        {/* Left */}
+        <div className="flex flex-col gap-5 lg:col-span-8">
           <InputCard title="اطلاعات عمومی">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="md:col-span-2">
                 <FormInput
                   label="نام محصول"
                   placeholder="مثال: کفش دویدن نایکی"
-                  {...register("name", { required: "نام محصول الزامی است." })}
+                  {...register("name", {
+                    required: "نام محصول الزامی است.",
+                  })}
                   error={errors.name?.message}
                 />
               </div>
+
               <FormSelect
                 label="دسته بندی"
                 options={categories}
@@ -122,7 +185,7 @@ export default function AddProductForm() {
           </InputCard>
 
           <InputCard title="قیمت">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <FormInput
                 label="قیمت واحد"
                 type="text"
@@ -135,30 +198,38 @@ export default function AddProductForm() {
                 })}
                 error={errors.price?.message}
               />
+
               <FormInput
                 label="تخفیف"
                 type="number"
                 dir="ltr"
                 placeholder="0"
                 suffix="%"
-                {...register("discount", { valueAsNumber: true })}
+                {...register("discount", {
+                  valueAsNumber: true,
+                })}
                 error={errors.discount?.message}
               />
             </div>
           </InputCard>
         </div>
 
-        <div className="lg:col-span-4 flex flex-col gap-5">
+        {/* Right */}
+        <div className="flex flex-col gap-5 lg:col-span-4">
           <Controller
             name="images"
             control={control}
-            render={({ field }) => <ImageUpload onChange={field.onChange} />}
-          />{" "}
+            render={({ field }) => (
+              <ImageUpload value={field.value} onChange={field.onChange} />
+            )}
+          />
+
           <Controller
             name="variants"
             control={control}
             rules={{
-              validate: (v) => v.length > 0 || "حداقل یک ترکیب اضافه کنید.",
+              validate: (value) =>
+                value.length > 0 || "حداقل یک ترکیب اضافه کنید.",
             }}
             render={({ field }) => (
               <div>
@@ -166,6 +237,7 @@ export default function AddProductForm() {
                   variants={field.value}
                   onChange={field.onChange}
                 />
+
                 {errors.variants?.message && (
                   <p className="mt-2 text-xs text-destructive">
                     {errors.variants.message}
@@ -176,6 +248,7 @@ export default function AddProductForm() {
           />
         </div>
 
+        {/* Description */}
         <div className="lg:col-span-12">
           <InputCard title="توضیحات محصول">
             <FormTextarea
@@ -189,20 +262,26 @@ export default function AddProductForm() {
         </div>
       </div>
 
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border px-4 py-3 flex gap-3 z-40">
+      {/* Mobile actions */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-3 border-t border-border bg-card px-4 py-3 md:hidden">
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex-1 py-3 rounded-xl border border-border text-foreground text-sm font-semibold"
+          className="flex-1 rounded-xl border border-border py-3 text-sm font-semibold text-foreground"
         >
           انصراف
         </button>
+
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-[2] py-3 rounded-xl bg-secondary text-secondary-foreground text-sm font-semibold disabled:opacity-50"
+          className="flex-[2] rounded-xl bg-secondary py-3 text-sm font-semibold text-secondary-foreground disabled:opacity-50"
         >
-          {isSubmitting ? "در حال ثبت..." : "ثبت محصول"}
+          {isSubmitting
+            ? "در حال ذخیره..."
+            : isEditMode
+              ? "ذخیره تغییرات"
+              : "ثبت محصول"}
         </button>
       </div>
     </form>

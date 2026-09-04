@@ -67,6 +67,7 @@ const addressSlice = createSlice({
       state.addresses = [];
       state.error = null;
     },
+    
   },
 
   extraReducers: (builder) => {

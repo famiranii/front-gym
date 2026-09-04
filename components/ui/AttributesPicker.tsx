@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import {  COLORS } from "@/types/product";
+import { COLORS } from "@/types/product";
 
 export type Variant = {
   label: string;
   color: string;
   stock: number;
+  id?: string;
 };
 
 interface Props {

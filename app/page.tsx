@@ -1,5 +1,4 @@
 import Header from "@/components/layout/Header";
-import BottomNav from "@/components/layout/BottomNav";
 
 import HeroSection from "@/components/featchers/home/HeroSection";
 import CategoriesSection from "@/components/featchers/home/CategorySection";
@@ -10,11 +9,10 @@ export default function HomePage() {
     <>
       <Header />
       <main className="pb-24 md:pb-0">
-        <HeroSection />
         <CategoriesSection />
+        <HeroSection />
         <NewArrivalsSection />
       </main>
-      <BottomNav />
     </>
   );
 }

@@ -1,3 +1,5 @@
+import { ReviewType } from "./reviewsType";
+
 export interface ProductImage {
   url: string;
 }
@@ -7,14 +9,6 @@ export interface ProductVariant {
   stock: number;
   label: string;
   id: string;
-}
-
-export interface Review {
-  id: string;
-  full_name: string;
-  rating: number;
-  created_at: string;
-  body: string;
 }
 
 export interface ProductSpec {
@@ -35,7 +29,7 @@ export interface Product {
   variants: ProductVariant[];
   specs: ProductSpec[];
   description: string;
-  reviews: Review[];
+  reviews: ReviewType[];
   tags: string[];
   final_price: number;
   discount: number;

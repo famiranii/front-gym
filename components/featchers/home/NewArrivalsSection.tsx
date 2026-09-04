@@ -1,18 +1,12 @@
 import Link from "next/link";
 import ProductCard from "@/components/ui/ProductCard";
 import { Product } from "@/types/product";
-
-async function getProducts(): Promise<Product[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) return [];
-  return res.json();
-}
+import { api } from "@/lib/api";
 
 export default async function NewArrivalsSection() {
-  const products = await getProducts();
-  console.log(products);
+  const products: Product[] = await api.get(
+    `/products?limit=${15}&offset=${0}`,
+  );
 
   return (
     <section className="py-10 px-6 bg-muted/30">
@@ -33,7 +27,7 @@ export default async function NewArrivalsSection() {
 
       <div className="flex overflow-x-auto gap-5 pb-6 scrollbar-hide">
         {products.map((product) => (
-          <Link href={`products/${product.id}`} key={product.id}>
+          <Link href={`product/${product.id}`} key={product.id}>
             <ProductCard product={product} />
           </Link>
         ))}

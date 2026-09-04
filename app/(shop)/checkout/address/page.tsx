@@ -2,16 +2,18 @@
 
 import { z } from "zod";
 import dynamic from "next/dynamic";
+import { useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
+import { useRouter, useSearchParams } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import FormInput from "@/components/ui/FormInput";
 import InputCard from "@/components/ui/InputCard";
 import PrimaryButton from "@/components/ui/PrimaryButton";
+
 import { api } from "@/lib/api";
 import { addressSchema } from "@/lib/schemas/address.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Address } from "@/types/addressType";
 
 const MapPicker = dynamic(
   () => import("@/components/featchers/map/MapPicker"),
@@ -20,22 +22,22 @@ const MapPicker = dynamic(
   },
 );
 
+type AddressForm = z.infer<typeof addressSchema>;
+
 export default function Page() {
-  type AddressForm = z.infer<typeof addressSchema>;
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [id, setId] = useState<string | null>(null);
+  const addressId = searchParams.get("id");
+  const isEditMode = Boolean(addressId);
 
-  useEffect(() => {
-    const userId = window.localStorage.getItem("id");
-    setId(userId);
-  }, []);
   const {
     register,
     control,
     setValue,
+    reset,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<AddressForm>({
     resolver: zodResolver(addressSchema),
     defaultValues: {
@@ -43,35 +45,92 @@ export default function Page() {
       province: "",
       city: "",
       address: "",
-      postalCode: "",
-      isDefault: false,
-      latitude: null,
-      longitude: null,
+      postal_code: "",
+      is_default: false,
+      lat: null,
+      lng: null,
     },
   });
-  const latitude = useWatch({
+
+  const lat = useWatch({
     control,
-    name: "latitude",
+    name: "lat",
   });
 
-  const longitude = useWatch({
+  const lng = useWatch({
     control,
-    name: "longitude",
+    name: "lng",
   });
+
+  // دریافت آدرس در حالت ویرایش
+  useEffect(() => {
+    if (!addressId) return;
+
+    const getAddress = async () => {
+      const userId = localStorage.getItem("id");
+
+      if (!userId) {
+        console.error("User ID not found");
+        return;
+      }
+
+      try {
+        const address: Address = await api.get(
+          `/users/${userId}/addresses/${addressId}`,
+        );
+
+        reset({
+          title: address.title ?? "",
+          province: address.province ?? "",
+          city: address.city ?? "",
+          address: address.address ?? "",
+          postal_code: address.postal_code ?? "",
+          is_default: address.is_default ?? false,
+          lat: address.lat ?? null,
+          lng: address.lng ?? null,
+        });
+      } catch (error) {
+        console.error("Get address error:", error);
+      }
+    };
+
+    getAddress();
+  }, [addressId, reset]);
+
   const onSubmit = async (data: AddressForm) => {
-    try {
-      const response = await api.post(`/users/${id}/addresses`, data);
+    const userId = localStorage.getItem("id");
 
-      console.log("Address created:", response);
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+
+    try {
+      if (isEditMode && addressId) {
+        // ویرایش
+        const response = await api.put(
+          `/users/${userId}/addresses/${addressId}`,
+          data,
+        );
+
+        console.log("Address updated:", response);
+      } else {
+        // ایجاد
+        const response = await api.post(`/users/${userId}/addresses`, data);
+
+        console.log("Address created:", response);
+      }
+
       router.push("/checkout");
     } catch (error) {
-      console.error(error);
+      console.error("Address save error:", error);
     }
   };
+
   return (
     <div className="flex items-center justify-center">
       <div className="my-8 w-5/6 md:w-1/2">
-        <InputCard title="آدرس">
+        <InputCard title={isEditMode ? "ویرایش آدرس" : "آدرس"}>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
@@ -105,8 +164,8 @@ export default function Page() {
               <FormInput
                 label="کد پستی"
                 placeholder="مثال: ۱۲۳۴۵۶۷۸۹۰"
-                {...register("postalCode")}
-                error={errors.postalCode?.message}
+                {...register("postal_code")}
+                error={errors.postal_code?.message}
               />
             </div>
 
@@ -129,27 +188,41 @@ export default function Page() {
 
               <MapPicker
                 value={
-                  latitude !== null && longitude !== null
+                  lat !== null && lng !== null
                     ? {
-                        lat: latitude,
-                        lng: longitude,
+                        lat,
+                        lng,
                       }
                     : null
                 }
                 onChange={(location) => {
-                  setValue("latitude", location.lat);
-                  setValue("longitude", location.lng);
+                  setValue("lat", location.lat, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+
+                  setValue("lng", location.lng, {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
                 }}
               />
             </div>
 
             {/* آدرس پیش‌فرض */}
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" {...register("isDefault")} />
+              <input type="checkbox" {...register("is_default")} />
               آدرس پیش‌فرض
             </label>
 
-            <PrimaryButton>ذخیره آدرس</PrimaryButton>
+            {/* دکمه */}
+            <PrimaryButton>
+              {isSubmitting
+                ? "در حال ذخیره..."
+                : isEditMode
+                  ? "ویرایش آدرس"
+                  : "ذخیره آدرس"}
+            </PrimaryButton>
           </form>
         </InputCard>
       </div>
