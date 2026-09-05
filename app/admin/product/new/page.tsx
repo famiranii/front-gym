@@ -47,12 +47,16 @@ export default function AddProductForm() {
 
   const dispatch = useAppDispatch();
 
-  const categories = useAppSelector((state) =>
-    state.categories.items.map((category) => ({
-      value: category.id,
-      label: category.name,
-    })),
-  );
+  const categories = useAppSelector((state) => {
+    const items = state.categories?.items;
+
+    return Array.isArray(items)
+      ? items.map((category) => ({
+          value: category.id,
+          label: category.name,
+        }))
+        : [];
+  });
 
   const {
     register,

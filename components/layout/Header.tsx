@@ -3,6 +3,9 @@ import Link from "next/link";
 import MobileHeader from "./MobileHeader";
 import BottomNav from "./header/bottomNav";
 import SearchBarWrapper from "./header/SearchBarWrapper";
+import CartButton from "../ui/icon-Butttons/CartButton";
+import ProfileButton from "../ui/icon-Butttons/ProfileButton";
+import OrderIcon from "../ui/icon-Butttons/OrderIcon";
 
 export default function Header() {
   return (
@@ -17,16 +20,9 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/account/profile"
-            className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors active:bg-muted"
-            aria-label="اطلاعات شخصی"
-          >
-            <span className="material-symbols-outlined text-[20px]">
-              person
-            </span>
-          </Link>
+          <OrderIcon />
           <CartButton count={2} />
+          <ProfileButton />
         </div>
       </header>
 
@@ -36,23 +32,5 @@ export default function Header() {
       {/* Mobile bottom nav */}
       <BottomNav />
     </>
-  );
-}
-
-function CartButton({ count }: { count: number }) {
-  return (
-    <Link
-      href="/cart"
-      className="relative w-9 h-9 flex items-center justify-center rounded-md border border-border bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
-    >
-      <span className="material-symbols-outlined text-[18px]">
-        shopping_bag
-      </span>
-      {count > 0 && (
-        <span className="absolute -top-1.5 -left-1.5 min-w-[16px] h-4 bg-destructive text-destructive-foreground text-[10px] font-semibold rounded-full flex items-center justify-center px-1 border-2 border-card">
-          {count}
-        </span>
-      )}
-    </Link>
   );
 }
