@@ -37,10 +37,6 @@ export default function LoginPage() {
     try {
       const res = await api.post<{
         session_id: string;
-        access_token: string;
-        refresh_token: string;
-        access_token_expires_at: string;
-        refresh_token_expires_at: string;
         user: {
           id: string;
           full_name: string;
@@ -51,9 +47,6 @@ export default function LoginPage() {
         phone: data.phone,
         password: data.password,
       });
-      localStorage.setItem("session_id", res.session_id);
-      localStorage.setItem("token", res.access_token);
-      localStorage.setItem("id", res.user.id);
       if (
         redirect &&
         redirect.startsWith("/") &&

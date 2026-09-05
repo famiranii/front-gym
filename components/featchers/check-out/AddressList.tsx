@@ -21,7 +21,7 @@ export default function AddressList({
     <section className="bg-card rounded-2xl border border-border p-5 flex flex-col gap-4 shadow-sm">
       <h2 className="text-lg font-extrabold text-foreground">آدرس تحویل</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3">
         {addresses.map((addr) => (
           <AddressCard
             key={addr.id}

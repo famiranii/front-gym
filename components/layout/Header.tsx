@@ -17,6 +17,15 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link
+            href="/account/profile"
+            className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors active:bg-muted"
+            aria-label="اطلاعات شخصی"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              person
+            </span>
+          </Link>
           <CartButton count={2} />
         </div>
       </header>

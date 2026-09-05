@@ -1,21 +1,18 @@
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const getToken = () => {
-  if (typeof window === "undefined") return null;
-
-  return localStorage.getItem("token");
-};
-
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const token = getToken();
-
   const res = await fetch(`${baseUrl}${endpoint}`, {
     ...options,
+
+    // خیلی مهم:
+    // باعث می‌شود browser cookieهای HttpOnly را
+    // همراه request به backend بفرستد.
+    credentials: "include",
+
     headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.body instanceof FormData
         ? {}
         : { "Content-Type": "application/json" }),
@@ -25,26 +22,23 @@ async function request<T>(
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
-    throw new Error(error.message || "Request failed");
+
+    throw new Error(error.message || error.error || "Request failed");
   }
 
-  // برای PATCH/DELETE که 204 می‌دهند
+  // PATCH / DELETE که 204 می‌دهند
   if (res.status === 204) {
     return undefined as T;
   }
 
   return res.json();
 }
-export const setToken = (token: string) => {
-  localStorage.setItem("token", token);
-};
-
-export const removeToken = () => {
-  localStorage.removeItem("token");
-};
 
 export const api = {
-  get: <T>(url: string) => request<T>(url, { method: "GET" }),
+  get: <T>(url: string) =>
+    request<T>(url, {
+      method: "GET",
+    }),
 
   post: <T>(url: string, data?: Record<string, unknown> | FormData) =>
     request<T>(url, {
@@ -64,5 +58,8 @@ export const api = {
       body: data instanceof FormData ? data : JSON.stringify(data),
     }),
 
-  delete: <T>(url: string) => request<T>(url, { method: "DELETE" }),
+  delete: <T>(url: string) =>
+    request<T>(url, {
+      method: "DELETE",
+    }),
 };

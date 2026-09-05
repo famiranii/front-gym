@@ -79,12 +79,6 @@ export default function PurchasePanel({ product }: { product: Product }) {
       return;
     }
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
     setLoading(true);
     setError("");
 

@@ -7,6 +7,7 @@ import PrimaryButton from "@/components/ui/PrimaryButton";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { ReviewType } from "@/types/reviewsType";
+import { useAppSelector } from "@/store/hook";
 
 export default function ReviewForm({
   onClose,
@@ -24,18 +25,17 @@ export default function ReviewForm({
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const user_id = useAppSelector((state) => state.users.me?.id);
 
-  const token = localStorage.getItem("token");
-  const user_id = localStorage.getItem("id");
   const currentPath = window.location.pathname + window.location.search;
 
-  if (!token) {
-    return (
-      <Link href={`/login?redirect=${encodeURIComponent(currentPath)}`}>
-        <PrimaryButton>باید وارد شوید</PrimaryButton>
-      </Link>
-    );
-  }
+  // if () {
+  //   return (
+  //     <Link href={`/login?redirect=${encodeURIComponent(currentPath)}`}>
+  //       <PrimaryButton>باید وارد شوید</PrimaryButton>
+  //     </Link>
+  //   );
+  // }
 
   const handleSubmit = async () => {
     if (!rating || !body.trim()) return;

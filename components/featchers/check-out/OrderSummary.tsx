@@ -1,9 +1,6 @@
-// components/checkout/OrderSummary.tsx
-
 "use client";
 
 import { CartSummary } from "@/types/cartTypes";
-
 
 function formatPrice(n: number) {
   return n.toLocaleString("fa-IR");
@@ -11,71 +8,65 @@ function formatPrice(n: number) {
 
 type Props = {
   summary: CartSummary;
+  shippingCost: number;
   selectedAddressId: string;
-  token: string;
-  onNext?: () => void;
+  loading: boolean;
+  error: string | null;
+  onSubmit: () => void;
 };
 
 export default function OrderSummary({
   summary,
+  shippingCost,
   selectedAddressId,
-  token,
-  onNext,
+  loading,
+  error,
+  onSubmit,
 }: Props) {
-  const handleNext = () => {
+  const total = summary.payable + shippingCost;
+
+  const handleSubmit = () => {
     if (!selectedAddressId) {
       alert("لطفاً آدرس را انتخاب کنید");
       return;
     }
-    onNext?.();
+    onSubmit();
   };
 
   return (
-    <div className="bg-card rounded-2xl border border-border p-5 sticky top-32 flex flex-col gap-4 shadow-sm">
-      <h3 className="text-lg font-extrabold text-foreground border-b border-border pb-3">
-        خلاصه سفارش
-      </h3>
-
-      <div className="flex flex-col gap-3 py-1">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">
-            مبلغ کل ({summary.count} کالا)
-          </span>
-          <span className="text-sm text-foreground">
-            {formatPrice(summary.total)} تومان
+    <div className="space-y-4">
+      <section className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-3">
+        <h2 className="text-lg font-extrabold text-foreground border-b border-border pb-2">
+          خلاصه سفارش
+        </h2>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">جمع کالاها</span>
+          <span className="text-foreground">
+            {formatPrice(summary.payable)}
           </span>
         </div>
-
-        {summary.discount > 0 && (
-          <div className="flex justify-between items-center text-destructive">
-            <span className="text-sm">تخفیف کالاها</span>
-            <span className="text-sm">
-              - {formatPrice(summary.discount)} تومان
-            </span>
-          </div>
-        )}
-
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-muted-foreground">هزینه ارسال</span>
-          <span className="text-sm text-muted-foreground">وابسته به آدرس</span>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">هزینه ارسال</span>
+          <span className="text-foreground">
+            {shippingCost === 0
+              ? "رایگان"
+              : formatPrice(shippingCost) + " تومان"}
+          </span>
         </div>
-      </div>
+        <div className="flex justify-between font-bold border-t border-border pt-3">
+          <span className="text-foreground">مبلغ قابل پرداخت</span>
+          <span className="text-primary">{formatPrice(total)} تومان</span>
+        </div>
+      </section>
 
-      <div className="flex justify-between items-center border-t border-border pt-3">
-        <span className="text-sm font-bold text-foreground">
-          مبلغ قابل پرداخت
-        </span>
-        <span className="text-xl font-extrabold text-foreground">
-          {formatPrice(summary.payable)} تومان
-        </span>
-      </div>
+      {error && <p className="text-destructive text-sm text-center">{error}</p>}
 
       <button
-        onClick={handleNext}
-        disabled={!selectedAddressId}
-        className="w-full py-3.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        onClick={handleSubmit}
+        disabled={!selectedAddressId || loading}
+        className="w-full bg-primary hover:bg-primary/90 disabled:bg-neutral disabled:text-muted-foreground text-primary-foreground font-bold py-3 rounded-2xl transition-colors"
       >
-        ادامه به مرحله بعد
+        {loading ? "در حال ثبت..." : "ثبت سفارش"}
       </button>
     </div>
   );
