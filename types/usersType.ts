@@ -3,4 +3,6 @@ export interface Me {
   full_name: string;
   phone: string;
   created_at: string;
+  cart_length: number;
+  pending_length: number;
 }

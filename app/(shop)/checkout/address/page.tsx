@@ -14,6 +14,7 @@ import PrimaryButton from "@/components/ui/PrimaryButton";
 import { api } from "@/lib/api";
 import { addressSchema } from "@/lib/schemas/address.schema";
 import { Address } from "@/types/addressType";
+import { useAppSelector } from "@/store/hook";
 
 const MapPicker = dynamic(
   () => import("@/components/featchers/map/MapPicker"),
@@ -27,6 +28,7 @@ type AddressForm = z.infer<typeof addressSchema>;
 export default function Page() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const userId = useAppSelector((state) => state.users.me?.id);
 
   const addressId = searchParams.get("id");
   const isEditMode = Boolean(addressId);
@@ -67,7 +69,6 @@ export default function Page() {
     if (!addressId) return;
 
     const getAddress = async () => {
-      const userId = localStorage.getItem("id");
 
       if (!userId) {
         console.error("User ID not found");
@@ -98,7 +99,6 @@ export default function Page() {
   }, [addressId, reset]);
 
   const onSubmit = async (data: AddressForm) => {
-    const userId = localStorage.getItem("id");
 
     if (!userId) {
       console.error("User ID not found");
