@@ -10,20 +10,39 @@ function formatPrice(n: number) {
   return n.toLocaleString("fa-IR") + " تومان";
 }
 
-const statusMap: Record<string, { label: string; color: string; icon: string }> = {
-  pending: { label: "در انتظار پرداخت", color: "text-warning", icon: "schedule" },
+const statusMap: Record<
+  string,
+  { label: string; color: string; icon: string }
+> = {
+  pending: {
+    label: "در انتظار پرداخت",
+    color: "text-warning",
+    icon: "schedule",
+  },
   paid: { label: "پرداخت شده", color: "text-success", icon: "check_circle" },
-  shipped: { label: "ارسال شده", color: "text-primary", icon: "local_shipping" },
-  delivered: { label: "تحویل داده شده", color: "text-success", icon: "inventory" },
+  shipped: {
+    label: "ارسال شده",
+    color: "text-primary",
+    icon: "local_shipping",
+  },
+  delivered: {
+    label: "تحویل داده شده",
+    color: "text-success",
+    icon: "inventory",
+  },
   cancelled: { label: "لغو شده", color: "text-destructive", icon: "cancel" },
 };
 
 function OrderCard({ order }: { order: Order }) {
-  const status = statusMap[order.status] ?? { label: order.status, color: "text-foreground", icon: "info" };
+  const status = statusMap[order.status] ?? {
+    label: order.status,
+    color: "text-foreground",
+    icon: "info",
+  };
 
   return (
     <Link href={`/orders/${order.id}`}>
-      <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-4 hover:border-neutral transition-colors cursor-pointer">
+      <div className="bg-card rounded-2xl border border-border p-4 flex items-center gap-4 hover:border-neutral transition-colors cursor-pointer my-4">
         <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
           <span className={`material-symbols-outlined text-xl ${status.color}`}>
             {status.icon}
@@ -33,10 +52,14 @@ function OrderCard({ order }: { order: Order }) {
           <p className="text-sm text-muted-foreground">
             {new Date(order.created_at).toLocaleDateString("fa-IR")}
           </p>
-          <p className={`text-sm font-semibold ${status.color}`}>{status.label}</p>
+          <p className={`text-sm font-semibold ${status.color}`}>
+            {status.label}
+          </p>
         </div>
         <div className="text-left shrink-0">
-          <p className="font-bold text-primary text-sm">{formatPrice(order.total_price)}</p>
+          <p className="font-bold text-primary text-sm">
+            {formatPrice(order.total_price)}
+          </p>
         </div>
         <span className="material-symbols-outlined text-muted-foreground text-lg">
           chevron_left

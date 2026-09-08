@@ -8,7 +8,7 @@ const bottomNavItems = [
   { label: "فروشگاه", href: "/shop", icon: "grid_view" },
   { label: "سبد", href: "/cart", icon: "shopping_bag", badge: 2 },
   { label: "سفارشات", href: "/orders", icon: "inventory_2" },
-  { label: "پروفایل", href: "/profile", icon: "person" },
+  { label: "پروفایل", href: "/account", icon: "person" },
 ];
 
 export default function BottomNav() {

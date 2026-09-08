@@ -69,9 +69,7 @@ export default function Page() {
     if (!addressId) return;
 
     const getAddress = async () => {
-
       if (!userId) {
-        console.error("User ID not found");
         return;
       }
 
@@ -99,9 +97,7 @@ export default function Page() {
   }, [addressId, reset]);
 
   const onSubmit = async (data: AddressForm) => {
-
     if (!userId) {
-      console.error("User ID not found");
       return;
     }
 
@@ -121,7 +117,7 @@ export default function Page() {
         console.log("Address created:", response);
       }
 
-      router.push("/checkout");
+      router.back();
     } catch (error) {
       console.error("Address save error:", error);
     }

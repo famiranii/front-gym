@@ -1,6 +1,14 @@
-import { api } from "@/lib/api";
+"use client";
 
-export default async function Page() {
-  // const user = await api.get(`/users/${}`);
-  return <div>Page</div>;
+import EditProfileForm from "@/components/featchers/profile/Form";
+
+export default function Page() {
+  return (
+    <main
+      className="min-h-screen bg-background px-4 py-6 sm:px-6  flex justify-center"
+      dir="rtl"
+    >
+      <EditProfileForm />
+    </main>
+  );
 }
