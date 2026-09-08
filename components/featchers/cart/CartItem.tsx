@@ -5,14 +5,16 @@ import {
   removeCartItemApi,
   updateCartQuantityApi,
 } from "@/store/slices/cartSlice";
+import { GetMeApi } from "@/store/slices/getMeSlice";
 import { CartItemType } from "@/types/cartTypes";
 
 export default function CartItem({ item }: { item: CartItemType }) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const dispatch = useAppDispatch();
 
-  const handleRemove = (id: string) => {
-    dispatch(removeCartItemApi(id));
+  const handleRemove = async(id: string) => {
+   await dispatch(removeCartItemApi(id));
+    dispatch(GetMeApi());
   };
 
   return (

@@ -10,7 +10,7 @@ const initialState: MeState = {
   me: null,
 };
 
-export const GetMeApi = createAsyncThunk("categories/fetch", async () => {
+export const GetMeApi = createAsyncThunk("me/fetch", async () => {
   return await api.get<Me>("/users/me");
 });
 

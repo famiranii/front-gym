@@ -4,9 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import SearchBar from "../ui/SearchBar";
-import CartButton from "./header/CartButton";
-
-
 
 export default function MobileHeader() {
   const router = useRouter();
@@ -51,18 +48,6 @@ export default function MobileHeader() {
           </button>
           <SearchBar open={searchOpen} onClose={() => setSearchOpen(false)} />
         </div>
-
-        {/* Profile */}
-        <Link
-          href="/profile"
-          className="flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors active:bg-muted"
-          aria-label="اطلاعات شخصی"
-        >
-          <span className="material-symbols-outlined text-[20px]">person</span>
-        </Link>
-
-        {/* Cart */}
-        <CartButton/>
       </div>
     </header>
   );

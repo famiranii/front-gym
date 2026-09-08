@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import PriceComponent from "@/components/ui/PriceComponent";
 import QuantityBtns from "@/components/ui/QuantityBtns";
+import { useAppDispatch } from "@/store/hook";
+import { GetMeApi } from "@/store/slices/getMeSlice";
 
 type CartFormValues = {
   variant_id: string;
@@ -15,7 +17,7 @@ type CartFormValues = {
 };
 
 export default function PurchasePanel({ product }: { product: Product }) {
-  const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const colors = Array.from(
     new Map(
@@ -87,7 +89,7 @@ export default function PurchasePanel({ product }: { product: Product }) {
         variant_id: data.variant_id,
         quantity: data.quantity,
       });
-
+      dispatch(GetMeApi())
       console.log(res);
 
       setAdded(true);

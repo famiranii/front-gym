@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/store/hook";
 import CartItem from "@/components/featchers/cart/CartItem";
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import Link from "next/link";
+import { GetMeApi } from "@/store/slices/getMeSlice";
 
 export default function Page() {
   const dispatch = useAppDispatch();
@@ -45,7 +46,7 @@ export default function Page() {
 
     try {
       await dispatch(clearCartApi()).unwrap();
-
+      dispatch(GetMeApi())
       // toast.success("سبد خرید با موفقیت خالی شد");
     } catch (error) {
       // toast.error(String(error));

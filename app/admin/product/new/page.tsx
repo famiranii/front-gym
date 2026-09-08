@@ -46,14 +46,18 @@ export default function AddProductForm() {
   const isEditMode = Boolean(productId);
 
   const dispatch = useAppDispatch();
-
-  const categories = useAppSelector((state) =>
-    state.categories.items.map((category) => ({
+  const categories = useAppSelector((state) => {
+    console.log(
+      "items type:",
+      typeof state.categories?.items,
+      Array.isArray(state.categories?.items),
+    );
+    return (state.categories?.items ?? []).map((category) => ({
       value: category.id,
       label: category.name,
-    })),
-  );
-
+    }));
+  });
+  
   const {
     register,
     control,
