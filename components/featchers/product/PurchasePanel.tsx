@@ -10,6 +10,7 @@ import PriceComponent from "@/components/ui/PriceComponent";
 import QuantityBtns from "@/components/ui/QuantityBtns";
 import { useAppDispatch } from "@/store/hook";
 import { GetMeApi } from "@/store/slices/getMeSlice";
+import { addToWishlist } from "@/store/slices/wishlistSlice";
 
 type CartFormValues = {
   variant_id: string;
@@ -89,7 +90,7 @@ export default function PurchasePanel({ product }: { product: Product }) {
         variant_id: data.variant_id,
         quantity: data.quantity,
       });
-      dispatch(GetMeApi())
+      dispatch(GetMeApi());
       console.log(res);
 
       setAdded(true);
@@ -259,6 +260,7 @@ export default function PurchasePanel({ product }: { product: Product }) {
 
         <button
           type="button"
+          onClick={() => dispatch(addToWishlist(product.id))}
           aria-label="افزودن به علاقه‌مندی‌ها"
           className="p-3.5 rounded-2xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-all"
         >

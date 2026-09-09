@@ -4,14 +4,16 @@ import cartReducer from "./slices/cartSlice";
 import addressReducer from "./slices/addressSlice";
 import meReducer from "./slices/getMeSlice";
 import orderReducer from "./slices/orderSlice";
+import wishlistReducer from "./slices/wishlistSlice";
 
 export const store = configureStore({
   reducer: {
     categories: categoryReducer,
     cart: cartReducer,
-    address:addressReducer,
-    users:meReducer,
-    order:orderReducer
+    address: addressReducer,
+    users: meReducer,
+    order: orderReducer,
+    wishlist: wishlistReducer,
   },
 });
 

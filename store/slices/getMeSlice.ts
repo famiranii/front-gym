@@ -17,7 +17,11 @@ export const GetMeApi = createAsyncThunk("me/fetch", async () => {
 const meSlice = createSlice({
   name: "me",
   initialState,
-  reducers: {},
+  reducers: {
+    clearMe: (state) => {
+      state.me = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(GetMeApi.pending, (state) => {})
@@ -27,5 +31,6 @@ const meSlice = createSlice({
       .addCase(GetMeApi.rejected, (state, action) => {});
   },
 });
-
+export const { clearMe } =
+  meSlice.actions;
 export default meSlice.reducer;

@@ -6,9 +6,6 @@ import { api } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { Product } from "@/types/product-detail";
 
-export function generateStaticParams() {
-  return [{ slug: "nike-air-zoom-pegasus-40" }];
-}
 interface Props {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ tab?: string }>;
