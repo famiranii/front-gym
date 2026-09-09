@@ -1,32 +1,49 @@
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
+if (!baseUrl) {
+  throw new Error("NEXT_PUBLIC_API_URL is not defined");
+}
+
+type RequestOptions = RequestInit & {
+  cookie?: string;
+};
+
 async function request<T>(
   endpoint: string,
-  options: RequestInit = {},
+  options: RequestOptions = {},
 ): Promise<T> {
+  const { cookie, ...fetchOptions } = options;
+
+  const headers = new Headers(fetchOptions.headers);
+
+  if (
+    !(fetchOptions.body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  // SSR: cookie را از request کاربر به backend forward می‌کنیم
+  if (cookie) {
+    headers.set("Cookie", cookie);
+  }
+
   const res = await fetch(`${baseUrl}${endpoint}`, {
-    ...options,
-
-    // خیلی مهم:
-    // باعث می‌شود browser cookieهای HttpOnly را
-    // همراه request به backend بفرستد.
+    ...fetchOptions,
     credentials: "include",
-
-    headers: {
-      ...(options.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" }),
-      ...options.headers,
-    },
+    headers,
   });
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
 
-    throw new Error(error.message || error.error || "Request failed");
+    throw new Error(
+      error.message ||
+        error.error ||
+        `Request failed with status ${res.status}`,
+    );
   }
 
-  // PATCH / DELETE که 204 می‌دهند
   if (res.status === 204) {
     return undefined as T;
   }
@@ -35,31 +52,63 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(url: string) =>
+  get: <T>(url: string, cookie?: string) =>
     request<T>(url, {
       method: "GET",
+      cookie,
     }),
 
-  post: <T>(url: string, data?: Record<string, unknown> | FormData) =>
+  post: <T>(
+    url: string,
+    data?: Record<string, unknown> | FormData,
+    cookie?: string,
+  ) =>
     request<T>(url, {
       method: "POST",
-      body: data instanceof FormData ? data : JSON.stringify(data),
+      cookie,
+      body:
+        data instanceof FormData
+          ? data
+          : data
+            ? JSON.stringify(data)
+            : undefined,
     }),
 
-  put: <T>(url: string, data?: Record<string, unknown> | FormData) =>
+  put: <T>(
+    url: string,
+    data?: Record<string, unknown> | FormData,
+    cookie?: string,
+  ) =>
     request<T>(url, {
       method: "PUT",
-      body: data instanceof FormData ? data : JSON.stringify(data),
+      cookie,
+      body:
+        data instanceof FormData
+          ? data
+          : data
+            ? JSON.stringify(data)
+            : undefined,
     }),
 
-  patch: <T>(url: string, data?: Record<string, unknown> | FormData) =>
+  patch: <T>(
+    url: string,
+    data?: Record<string, unknown> | FormData,
+    cookie?: string,
+  ) =>
     request<T>(url, {
       method: "PATCH",
-      body: data instanceof FormData ? data : JSON.stringify(data),
+      cookie,
+      body:
+        data instanceof FormData
+          ? data
+          : data
+            ? JSON.stringify(data)
+            : undefined,
     }),
 
-  delete: <T>(url: string) =>
+  delete: <T>(url: string, cookie?: string) =>
     request<T>(url, {
       method: "DELETE",
+      cookie,
     }),
 };

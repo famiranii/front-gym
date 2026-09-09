@@ -1,55 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   addToWishlist,
-  removeFromWishlist,
-  selectIsInWishlist,
 } from "@/store/slices/wishlistSlice";
 import { useAppDispatch } from "@/store/hook";
 
 interface Props {
   productId: string;
-  className?: string;
+  isSaved?: boolean;
 }
 
-export default function WishlistButton({ productId, className = "" }: Props) {
+export default function WishlistButton({ productId, isSaved = false }: Props) {
   const dispatch = useAppDispatch();
-  const active = useSelector(selectIsInWishlist(productId));
-  const [loading, setLoading] = useState(false);
+  const [saved, setSaved] = useState(isSaved);
 
-  const handleClick = async () => {
-    setLoading(true);
-    try {
-      if (active) {
-        await dispatch(removeFromWishlist(productId));
-      } else {
-        await dispatch(addToWishlist(productId));
-      }
-    } finally {
-      setLoading(false);
-    }
+  const toggle = () => {
+    setSaved((prev) => !prev);
+
+    dispatch(addToWishlist(productId)); 
   };
 
   return (
     <button
-      onClick={handleClick}
-      disabled={loading}
-      aria-label={active ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
-      className={[
-        "flex items-center justify-center transition-all active:scale-90 disabled:opacity-50",
-        className,
-      ].join(" ")}
+      type="button"
+      onClick={toggle}
+      aria-label={saved ? "حذف از علاقه‌مندی‌ها" : "افزودن به علاقه‌مندی‌ها"}
+      className={`p-3.5 pb-2 rounded-2xl border transition-all ${
+        saved
+          ? "text-destructive border-destructive/40"
+          : "text-muted-foreground border-border hover:text-destructive hover:border-destructive/40"
+      }`}
     >
       <span
-        className={[
-          "material-symbols-outlined text-xl leading-none transition-colors",
-          active
-            ? "text-destructive"
-            : "text-muted-foreground hover:text-destructive",
-        ].join(" ")}
-        style={{ fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0" }}
+        className="material-symbols-outlined text-base leading-none"
+        style={{ fontVariationSettings: saved ? "'FILL' 1" : "'FILL' 0" }}
       >
         favorite
       </span>

@@ -5,17 +5,30 @@ import MobileBuyBarWrapper from "@/components/featchers/product/MobileBuyBarWrap
 import { api } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { Product } from "@/types/product-detail";
+import { cookies } from "next/headers";
 
 interface Props {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ tab?: string }>;
 }
-export default async function ProductPage({ params, searchParams }: Props) {
+
+export default async function ProductPage({
+  params,
+  searchParams,
+}: Props) {
   const { slug } = await params;
   const { tab } = await searchParams;
+
   let product: Product;
+
   try {
-    product = await api.get<Product>(`/products/${slug}`);
+    const cookieStore = await cookies();
+
+    product = await api.get<Product>(
+      `/products/${slug}`,
+      cookieStore.toString(),
+    );
+
     console.log(product);
   } catch {
     notFound();

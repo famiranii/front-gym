@@ -11,6 +11,7 @@ import QuantityBtns from "@/components/ui/QuantityBtns";
 import { useAppDispatch } from "@/store/hook";
 import { GetMeApi } from "@/store/slices/getMeSlice";
 import { addToWishlist } from "@/store/slices/wishlistSlice";
+import WishlistButton from "@/components/ui/wishListButton";
 
 type CartFormValues = {
   variant_id: string;
@@ -257,17 +258,10 @@ export default function PurchasePanel({ product }: { product: Product }) {
                 ? "در حال افزودن..."
                 : "افزودن به سبد خرید"}
         </button>
-
-        <button
-          type="button"
-          onClick={() => dispatch(addToWishlist(product.id))}
-          aria-label="افزودن به علاقه‌مندی‌ها"
-          className="p-3.5 rounded-2xl border border-border text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-all"
-        >
-          <span className="material-symbols-outlined text-base leading-none">
-            favorite
-          </span>
-        </button>
+        <WishlistButton
+          productId={product.id}
+          isSaved={product.is_saved}
+        />{" "}
       </div>
 
       {/* Trust signals */}

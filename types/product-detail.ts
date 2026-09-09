@@ -33,4 +33,5 @@ export interface Product {
   tags: string[];
   final_price: number;
   discount: number;
+  is_saved?: boolean;
 }

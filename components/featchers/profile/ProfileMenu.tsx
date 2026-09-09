@@ -32,7 +32,7 @@ const profileItems = [
   {
     label: "علاقه‌مندی‌ها",
     description: "محصولاتی که ذخیره کرده‌اید",
-    href: "/account/favorites",
+    href: "/wishlist",
     icon: "favorite",
   },
   {

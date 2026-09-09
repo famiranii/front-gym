@@ -1,19 +1,9 @@
 import { api } from "@/lib/api";
+import { Product } from "@/types/product";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-export interface WishlistItem {
-  id: string;
-  created_at: string;
-  product_id: string;
-  product_name: string;
-  product_price: number;
-  product_discount: number;
-  product_is_active: boolean;
-  primary_image: string | null;
-}
-
 type WishlistState = {
-  items: WishlistItem[];
+  items: Product[];
   loading: boolean;
   error: string | null;
 };
@@ -25,13 +15,13 @@ const initialState: WishlistState = {
 };
 
 export const fetchWishlist = createAsyncThunk("wishlist/fetch", async () => {
-  return await api.get<WishlistItem[]>("/wishlist");
+  return await api.get<Product[]>("/wishlist");
 });
 
 export const addToWishlist = createAsyncThunk(
   "wishlist/add",
   async (productId: string) => {
-    const res: WishlistItem = await api.post(`/wishlist`, {
+    const res: Product = await api.post(`/wishlist`, {
       product_id: productId,
     });
     return res;
@@ -70,12 +60,8 @@ const wishlistSlice = createSlice({
       .addCase(addToWishlist.fulfilled, (state, action) => {
         state.items.unshift(action.payload);
       })
-
-      // remove — optimistic: آیتم رو فوری از state حذف می‌کنه
-      .addCase(removeFromWishlist.pending, (state, action) => {
-        state.items = state.items.filter(
-          (item) => item.product_id !== action.meta.arg,
-        );
+      .addCase(removeFromWishlist.fulfilled, (state, action) => {
+        state.items = state.items.filter((item) => item.id !== action.meta.arg);
       })
       .addCase(removeFromWishlist.rejected, (state, action) => {
         state.error = action.error.message ?? "خطا در حذف";
@@ -94,4 +80,4 @@ export const selectWishlistLoading = (state: { wishlist: WishlistState }) =>
 
 export const selectIsInWishlist =
   (productId: string) => (state: { wishlist: WishlistState }) =>
-    state.wishlist.items.some((item) => item.product_id === productId);
+    state.wishlist.items.some((item) => item.id === productId);
