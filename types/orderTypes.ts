@@ -10,6 +10,7 @@ export type Order = {
   address_detail: string | null;
   address_postal_code: string | null;
   created_at: string;
+  user_phone: number;
 };
 
 export type OrderItem = {
