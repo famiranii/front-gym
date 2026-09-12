@@ -1,19 +1,19 @@
 "use client";
 
+import { useAppSelector } from "@/store/hook";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const bottomNavItems = [
-  { label: "خانه", href: "/", icon: "home" },
-  { label: "فروشگاه", href: "/shop", icon: "grid_view" },
-  { label: "سبد", href: "/cart", icon: "shopping_bag", badge: 2 },
-  { label: "سفارشات", href: "/orders", icon: "inventory_2" },
-  { label: "پروفایل", href: "/account", icon: "person" },
-];
-
 export default function BottomNav() {
   const pathname = usePathname();
-
+  const count = useAppSelector((state) => state.users.me?.cart_length ?? 0);
+  const bottomNavItems = [
+    { label: "خانه", href: "/", icon: "home" },
+    { label: "فروشگاه", href: "/shop", icon: "grid_view" },
+    { label: "سبد", href: "/cart", icon: "shopping_bag", badge: count ?? 0 },
+    { label: "سفارشات", href: "/orders", icon: "inventory_2" },
+    { label: "پروفایل", href: "/account", icon: "person" },
+  ];
   const isProductPage = pathname.startsWith("/product/");
 
   if (isProductPage) {

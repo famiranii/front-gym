@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import SearchBar from "../ui/SearchBar";
+import CartButton from "./header/CartButton";
 
 export default function MobileHeader() {
   const router = useRouter();
@@ -34,6 +34,7 @@ export default function MobileHeader() {
 
       {/* Search + Profile + Cart */}
       <div className="flex items-center gap-1">
+        <CartButton />
         {/* Search */}
         <div className="relative">
           <button

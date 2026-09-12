@@ -1,7 +1,6 @@
 import DashboardHeader from "@/components/featchers/admin/dashboard/DashboardHeader";
 import DashboardStats from "@/components/featchers/admin/dashboard/DashboardStats";
 import RecentOrders from "@/components/featchers/admin/dashboard/RecentOrders";
-import DashboardActions from "@/components/featchers/admin/dashboard/DashboardActions";
 import LowStockProducts from "@/components/featchers/admin/dashboard/LowStockProducts";
 import TopProducts from "@/components/featchers/admin/dashboard/TopProducts";
 import DashboardSalesChart from "@/components/featchers/admin/dashboard/DashobardSalesChart";
