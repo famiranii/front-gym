@@ -3,8 +3,6 @@
 import { useState } from "react";
 import StarRating from "./StarRating";
 import { useParams } from "next/navigation";
-import PrimaryButton from "@/components/ui/PrimaryButton";
-import Link from "next/link";
 import { api } from "@/lib/api";
 import { ReviewType } from "@/types/reviewsType";
 import { useAppSelector } from "@/store/hook";
@@ -12,11 +10,9 @@ import { useAppSelector } from "@/store/hook";
 export default function ReviewForm({
   onClose,
   onSuccess,
-  onAddReview,
 }: {
   onClose: () => void;
   onSuccess?: () => void;
-  onAddReview: (review: ReviewType) => void;
 }) {
   const params = useParams();
   const productId = params.slug;
@@ -49,7 +45,6 @@ export default function ReviewForm({
         rating,
         body,
       });
-      onAddReview(res);
       setSubmitted(true);
       onSuccess?.();
     } catch (e: unknown) {
@@ -65,7 +60,7 @@ export default function ReviewForm({
         <span className="material-symbols-outlined text-4xl text-success">
           check_circle
         </span>
-        <p className="font-bold text-foreground">نظر شما ثبت شد</p>
+        <p className="font-bold text-foreground">نظر شما ثبت شد منتظر تایید باشید</p>
         <button
           onClick={onClose}
           className="mt-2 text-sm font-semibold text-accent hover:underline"

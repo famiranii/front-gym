@@ -8,8 +8,8 @@ const navItems = [
   { label: "داشبورد", icon: "dashboard", href: "/admin" },
   { label: "مدیریت محصولات", icon: "inventory_2", href: "/admin/products" },
   { label: "سفارشات جدید", icon: "pending_actions", href: "/admin/orders" },
-  { label: "گزارشات مالی", icon: "analytics", href: "/admin/reports" },
-  { label: "تنظیمات", icon: "settings", href: "/admin/settings" },
+  { label: "نظرات", icon: "reviews", href: "/admin/reviews" },
+  { label: "کاربران", icon: "group", href: "/admin/customers" },
   { label: "دسته بندی ", icon: "folder", href: "/admin/categories" },
 ];
 

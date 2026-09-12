@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "material-symbols";
+
 import Providers from "@/components/Providers";
-import Header from "@/components/layout/Header";
 import GetMe from "@/components/featchers/home/GetMe";
 
 export const metadata: Metadata = {
@@ -19,7 +20,9 @@ export default function RootLayout({
       <body className="min-h-screen text-right">
         <main className="w-full mx-auto">
           <Providers>
-            <GetMe/>{children}</Providers>
+            <GetMe />
+            {children}
+          </Providers>
         </main>
       </body>
     </html>

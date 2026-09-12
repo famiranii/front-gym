@@ -1,11 +1,10 @@
 "use client";
-
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 import { api } from "@/lib/api";
 import { OrderDetail } from "@/types/orderTypes";
+import { getColorName } from "@/lib/getColor";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("fa-IR").format(price);
@@ -187,7 +186,7 @@ export default function OrderInvoice({
             </div>
 
             {/* Postal Code */}
-            <div className="rounded-xl border bg-muted/20 p-4 sm:max-w-xs">
+            <div className="rounded-xl border bg-muted/20 p-4">
               <span className="mb-1 block text-xs text-muted-foreground">
                 کد پستی
               </span>
@@ -263,12 +262,7 @@ export default function OrderInvoice({
                         {item.color && (
                           <span className="flex items-center gap-2">
                             رنگ:
-                            <i
-                              className="h-4 w-4 rounded-full border"
-                              style={{
-                                backgroundColor: item.color,
-                              }}
-                            />
+                            {getColorName(item.color)}
                           </span>
                         )}
                       </div>
@@ -301,23 +295,6 @@ export default function OrderInvoice({
                 className="rounded-xl border bg-background p-4"
               >
                 <div className="flex gap-3">
-                  {item.image_url ? (
-                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border bg-muted">
-                      <Image
-                        src={item.image_url}
-                        alt={item.product_name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border bg-muted">
-                      <span className="material-symbols-outlined text-muted-foreground">
-                        image
-                      </span>
-                    </div>
-                  )}
-
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-3">
                       <strong className="text-sm leading-6">

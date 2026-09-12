@@ -19,24 +19,6 @@ export default function ReviewsClient({
       currentReviews.filter((review) => review.id !== reviewId),
     );
   }
-
-  const addNewReview = (review: ReviewType) => {
-    setReviews((currentReviews) => {
-      const existingIndex = currentReviews.findIndex(
-        (currentReview) => currentReview.user_id === review.user_id,
-      );
-
-      if (existingIndex === -1) {
-        return [review, ...currentReviews];
-      }
-
-      return currentReviews.map((currentReview) =>
-        currentReview.user_id === review.user_id ? review : currentReview,
-      );
-    });
-
-    setShowForm(false);
-  };
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-4">
@@ -55,7 +37,6 @@ export default function ReviewsClient({
         {showForm && (
           <ReviewForm
             onClose={() => setShowForm(false)}
-            onAddReview={addNewReview}
           />
         )}
       </div>
