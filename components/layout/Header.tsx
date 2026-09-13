@@ -3,6 +3,13 @@ import MobileHeader from "./MobileHeader";
 import BottomNav from "./header/bottomNav";
 import SearchBarWrapper from "./header/SearchBarWrapper";
 import CartButton from "./header/CartButton";
+import Image from "next/image";
+import { Vazirmatn } from "next/font/google";
+
+const vazir = Vazirmatn({
+  subsets: ["arabic"],
+  weight: ["400", "700", "900"],
+});
 
 const headerItems = [
   {
@@ -25,15 +32,29 @@ const headerItems = [
 export default function Header() {
   return (
     <>
-      <header className="sticky top-0 z-40 hidden h-[60px] w-full items-center justify-between border-b border-border bg-card px-8 md:flex">
-        <div className="flex items-center gap-6">
-          <Link
-            href="/"
-            className="text-lg font-bold tracking-tight text-foreground"
-          >
-            پولاد<span className="text-primary">.</span>
-          </Link>
-
+      <header className="sticky top-0 z-40 hidden h-[76px] w-full items-center justify-between border-b border-border bg-card px-8 md:flex">
+        <div className="flex items-center gap-6 rounded-full">
+          <div className="flex items-center">
+            <div className="rounded-full bg-gray-50/10 p-2">
+              <Link
+                href="/"
+                className="flex items-center justify-center w-10 h-10"
+              >
+                <Image
+                  src="/images/logo/chehel.png"
+                  alt="چهل تیکه"
+                  width={56}
+                  height={56}
+                  className="object-contain"
+                />
+              </Link>
+            </div>
+            <h1
+              className={`${vazir.className} text-2xl font-black text-gray-400 tracking-tight`}
+            >
+              چهل<span className="text-[#FF9F0A]">تیکه</span>
+            </h1>{" "}
+          </div>
           <SearchBarWrapper />
         </div>
 
