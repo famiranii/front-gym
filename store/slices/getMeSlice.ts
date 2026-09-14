@@ -9,9 +9,8 @@ type MeState = {
 const initialState: MeState = {
   me: null,
 };
-
 export const GetMeApi = createAsyncThunk("me/fetch", async () => {
-  return await api.get<Me>("/users/me");
+  return await api.get<Me>("/users/me", undefined, true);
 });
 
 const meSlice = createSlice({
@@ -31,6 +30,5 @@ const meSlice = createSlice({
       .addCase(GetMeApi.rejected, (state, action) => {});
   },
 });
-export const { clearMe } =
-  meSlice.actions;
+export const { clearMe } = meSlice.actions;
 export default meSlice.reducer;

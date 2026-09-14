@@ -6,13 +6,14 @@ if (!baseUrl) {
 
 type RequestOptions = RequestInit & {
   cookie?: string;
+  skipAuthRedirect?: boolean;
 };
 
 async function request<T>(
   endpoint: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { cookie, ...fetchOptions } = options;
+  const { cookie, skipAuthRedirect, ...fetchOptions } = options;
 
   const headers = new Headers(fetchOptions.headers);
 
@@ -23,7 +24,6 @@ async function request<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  // SSR: cookie را از request کاربر به backend forward می‌کنیم
   if (cookie) {
     headers.set("Cookie", cookie);
   }
@@ -36,6 +36,14 @@ async function request<T>(
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
+
+    if (
+      res.status === 401 &&
+      !skipAuthRedirect &&
+      typeof window !== "undefined"
+    ) {
+      window.location.href = "/login";
+    }
 
     throw new Error(
       error.message ||
@@ -52,20 +60,23 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(url: string, cookie?: string) =>
+  get: <T>(url: string, cookie?: string, skipAuthRedirect = false) =>
     request<T>(url, {
       method: "GET",
       cookie,
+      skipAuthRedirect,
     }),
 
   post: <T>(
     url: string,
     data?: Record<string, unknown> | FormData,
     cookie?: string,
+    skipAuthRedirect = false,
   ) =>
     request<T>(url, {
       method: "POST",
       cookie,
+      skipAuthRedirect,
       body:
         data instanceof FormData
           ? data
@@ -78,10 +89,12 @@ export const api = {
     url: string,
     data?: Record<string, unknown> | FormData,
     cookie?: string,
+    skipAuthRedirect = false,
   ) =>
     request<T>(url, {
       method: "PUT",
       cookie,
+      skipAuthRedirect,
       body:
         data instanceof FormData
           ? data
@@ -94,10 +107,12 @@ export const api = {
     url: string,
     data?: Record<string, unknown> | FormData,
     cookie?: string,
+    skipAuthRedirect = false,
   ) =>
     request<T>(url, {
       method: "PATCH",
       cookie,
+      skipAuthRedirect,
       body:
         data instanceof FormData
           ? data
@@ -106,9 +121,10 @@ export const api = {
             : undefined,
     }),
 
-  delete: <T>(url: string, cookie?: string) =>
+  delete: <T>(url: string, cookie?: string, skipAuthRedirect = false) =>
     request<T>(url, {
       method: "DELETE",
       cookie,
+      skipAuthRedirect,
     }),
 };

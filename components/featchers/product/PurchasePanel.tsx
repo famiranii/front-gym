@@ -1,16 +1,23 @@
 "use client";
 
 import { useState } from "react";
+
 import { useForm } from "react-hook-form";
+
 import StarRating from "./StarRating";
+
 import { Product } from "@/types/product-detail";
-import { useRouter } from "next/navigation";
+
 import { api } from "@/lib/api";
+
 import PriceComponent from "@/components/ui/PriceComponent";
+
 import QuantityBtns from "@/components/ui/QuantityBtns";
+
 import { useAppDispatch } from "@/store/hook";
+
 import { GetMeApi } from "@/store/slices/getMeSlice";
-import { addToWishlist } from "@/store/slices/wishlistSlice";
+
 import WishlistButton from "@/components/ui/wishListButton";
 
 type CartFormValues = {
@@ -30,10 +37,15 @@ export default function PurchasePanel({ product }: { product: Product }) {
   const [selectedColor, setSelectedColor] = useState<string>(
     colors[0]?.color ?? "",
   );
+
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+
   const [added, setAdded] = useState(false);
+
   const [sizeError, setSizeError] = useState(false);
+
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState("");
 
   const { setValue, watch, handleSubmit } = useForm<CartFormValues>({
@@ -42,20 +54,31 @@ export default function PurchasePanel({ product }: { product: Product }) {
 
   const qty = watch("quantity");
 
-  const selectedVariant = product.variants.find(
-    (v) => v.color === selectedColor && v.label === selectedSize,
-  );
-
   const availableSizes = Array.from(
     new Map(
       product.variants
-        .filter((v) => v.color === selectedColor)
+        .filter((v) => (selectedColor ? v.color === selectedColor : !v.color))
+        .filter((v) => v.label.trim() !== "")
         .map((v) => [v.label, v]),
     ).values(),
   );
 
+  const hasSize = availableSizes.length > 0;
+
+  const noSizeVariant = product.variants.find(
+    (v) =>
+      (selectedColor ? v.color === selectedColor : !v.color) &&
+      v.label.trim() === "",
+  );
+
+  const selectedVariant = product.variants.find(
+    (v) => v.color === selectedColor && v.label === selectedSize,
+  );
+
+  const actualVariant = hasSize ? selectedVariant : noSizeVariant;
+
   const outOfStock =
-    selectedVariant?.stock !== undefined && selectedVariant.stock <= 0;
+    actualVariant?.stock !== undefined && actualVariant.stock <= 0;
 
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
@@ -73,13 +96,15 @@ export default function PurchasePanel({ product }: { product: Product }) {
   };
 
   const onSubmit = async (data: CartFormValues) => {
-    if (!selectedSize) {
+    if (hasSize && !selectedSize) {
       setSizeError(true);
       return;
     }
-    if (!selectedVariant || selectedVariant.stock <= 0) return;
-    if (data.quantity > selectedVariant.stock) {
-      setValue("quantity", selectedVariant.stock);
+
+    if (!actualVariant || actualVariant.stock <= 0) return;
+
+    if (data.quantity > actualVariant.stock) {
+      setValue("quantity", actualVariant.stock);
       return;
     }
 
@@ -88,20 +113,19 @@ export default function PurchasePanel({ product }: { product: Product }) {
 
     try {
       const res = await api.post(`/cart`, {
-        variant_id: data.variant_id,
+        variant_id: actualVariant.id,
         quantity: data.quantity,
       });
+
       dispatch(GetMeApi());
+
       console.log(res);
 
       setAdded(true);
+
       setTimeout(() => setAdded(false), 2200);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError("خطایی در افزودن محصول به سبد خرید رخ داد");
-      }
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -114,6 +138,7 @@ export default function PurchasePanel({ product }: { product: Product }) {
         <p className="text-xs font-semibold text-accent uppercase tracking-widest mb-1">
           {product.brand} · {product.category}
         </p>
+
         <h1 className="text-xl md:text-2xl font-extrabold text-foreground leading-snug">
           {product.name}
         </h1>
@@ -122,9 +147,11 @@ export default function PurchasePanel({ product }: { product: Product }) {
       {/* Rating */}
       <div className="flex items-center gap-2">
         <StarRating rating={product.average_rating} size="sm" />
+
         <span className="text-sm font-bold text-foreground">
           {product.average_rating}
         </span>
+
         <span className="text-sm text-muted-foreground">
           ({product.reviewCount} نظر)
         </span>
@@ -149,10 +176,12 @@ export default function PurchasePanel({ product }: { product: Product }) {
             {selectedColor || "انتخاب نشده"}
           </span>
         </span>
+
         <div className="flex gap-2">
           {colors.map((variant) => {
             const color = variant.color;
             const active = selectedColor === color;
+
             return (
               <button
                 key={color}
@@ -174,57 +203,67 @@ export default function PurchasePanel({ product }: { product: Product }) {
       </div>
 
       {/* Size */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <span
-            className={[
-              "text-xs font-semibold",
-              sizeError ? "text-destructive" : "text-muted-foreground",
-            ].join(" ")}
-          >
-            {sizeError ? "لطفاً سایز را انتخاب کنید" : "سایز"}
-          </span>
-          <button type="button" className="text-xs text-accent hover:underline">
-            راهنمای سایز
-          </button>
+      {hasSize && (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span
+              className={[
+                "text-xs font-semibold",
+                sizeError ? "text-destructive" : "text-muted-foreground",
+              ].join(" ")}
+            >
+              {sizeError ? "لطفاً سایز را انتخاب کنید" : "سایز"}
+            </span>
+
+            <button
+              type="button"
+              className="text-xs text-accent hover:underline"
+            >
+              راهنمای سایز
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {availableSizes.map(({ id, label, stock }) => {
+              const oos = stock <= 0;
+              const active = selectedSize === label;
+
+              return (
+                <button
+                  key={`${selectedColor}-${label}`}
+                  type="button"
+                  disabled={oos}
+                  onClick={() => handleSizeChange(label, id)}
+                  className={[
+                    "min-w-[3rem] px-3 py-2 rounded-xl text-sm font-bold transition-all border",
+                    oos
+                      ? "border-border text-border line-through cursor-not-allowed opacity-40"
+                      : active
+                        ? "bg-secondary text-secondary-foreground border-secondary shadow-sm scale-105"
+                        : "border-border text-foreground hover:border-accent",
+                  ].join(" ")}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
+          {availableSizes.length === 0 && (
+            <span className="text-xs text-destructive">
+              برای این رنگ سایزی موجود نیست
+            </span>
+          )}
         </div>
-        <div className="flex flex-wrap gap-2">
-          {availableSizes.map(({ id, label, stock }) => {
-            const oos = stock <= 0;
-            const active = selectedSize === label;
-            return (
-              <button
-                key={`${selectedColor}-${label}`}
-                type="button"
-                disabled={oos}
-                onClick={() => handleSizeChange(label, id)}
-                className={[
-                  "min-w-[3rem] px-3 py-2 rounded-xl text-sm font-bold transition-all border",
-                  oos
-                    ? "border-border text-border line-through cursor-not-allowed opacity-40"
-                    : active
-                      ? "bg-secondary text-secondary-foreground border-secondary shadow-sm scale-105"
-                      : "border-border text-foreground hover:border-accent",
-                ].join(" ")}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-        {availableSizes.length === 0 && (
-          <span className="text-xs text-destructive">
-            برای این رنگ سایزی موجود نیست
-          </span>
-        )}
-      </div>
+      )}
 
       {/* Quantity */}
       <QuantityBtns
         quantity={qty}
-        stock={selectedVariant?.stock}
+        stock={actualVariant?.stock}
         onChange={(value) => setValue("quantity", value)}
       />
+
       {error && <p className="text-xs text-destructive">{error}</p>}
 
       {/* CTA */}
@@ -250,6 +289,7 @@ export default function PurchasePanel({ product }: { product: Product }) {
                 ? "remove_shopping_cart"
                 : "shopping_bag"}
           </span>
+
           {outOfStock
             ? "ناموجود"
             : added
@@ -282,9 +322,11 @@ export default function PurchasePanel({ product }: { product: Product }) {
             <span className="material-symbols-outlined text-lg text-accent">
               {item.icon}
             </span>
+
             <span className="text-[11px] font-bold text-foreground leading-tight">
               {item.label}
             </span>
+
             <span className="text-[10px] text-muted-foreground leading-tight">
               {item.sub}
             </span>

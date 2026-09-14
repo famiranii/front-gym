@@ -73,7 +73,7 @@ export default function SearchResults({ q, sort, initialProducts }: Props) {
       {/* موبایل */}
       <div className="flex flex-col gap-3 sm:hidden">
         {products.map((product) => (
-          <Link href={`/products/${product.id}`} key={product.id}>
+          <Link href={`/product/${product.id}`} key={product.id}>
             <ProductCardMobile product={product} />
           </Link>
         ))}
@@ -83,7 +83,7 @@ export default function SearchResults({ q, sort, initialProducts }: Props) {
       <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-24">
         {products.map((product) => (
           <Link
-            href={`/products/${product.id}`}
+            href={`/product/${product.id}`}
             key={product.id}
             className="h-full"
           >

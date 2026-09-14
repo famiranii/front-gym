@@ -3,19 +3,23 @@ import ProductCard from "@/components/ui/ProductCard";
 import { Product } from "@/types/product";
 import { api } from "@/lib/api";
 
-export default async function NewArrivalsSection() {
+export default async function NewArrivalsSection({
+  text,
+  sort,
+}: {
+  text: string;
+  sort: string;
+}) {
   const products: Product[] = await api.get(
-    `/products?limit=${15}&offset=${0}`,
+    `/products?limit=${15}&offset=${0}&sort=${sort}`,
   );
 
   return (
     <section className="py-10 px-6 bg-muted/30">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-xl font-semibold text-foreground">
-          تازه‌های فروشگاه
-        </h2>
+        <h2 className="text-xl font-semibold text-foreground">{text} </h2>
         <Link
-          href="/products"
+          href={`/products?sort=${sort}`}
           className="text-sm text-tertiary hover:text-foreground transition-colors flex items-center gap-1"
         >
           مشاهده همه

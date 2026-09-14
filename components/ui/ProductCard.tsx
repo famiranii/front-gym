@@ -20,12 +20,6 @@ export default function ProductCard({
     product.price
   );
 
-  const formattedCreatedAt = new Intl.DateTimeFormat("fa-IR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  }).format(new Date(product.created_at));
-
   return (
     <div
       data-product-id={product.id}

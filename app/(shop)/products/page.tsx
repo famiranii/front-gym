@@ -63,27 +63,25 @@ export default async function SearchPage({ searchParams }: Props) {
       dir="rtl"
       className="mx-auto min-h-screen max-w-7xl bg-background px-5 py-8"
     >
-      <ProductSort sort={sort} />
-      <div className="mb-8">
-        {search ? (
-          <>
-            <p className="mb-1 text-sm text-muted-foreground">
-              نتایج جستجو برای
-            </p>
+      <div className="mb-8 flex justify-between">
+        <div>
+          {search ? (
+            <>
+              <p className="mb-1 text-sm text-muted-foreground">
+                نتایج جستجو برای
+              </p>
 
+              <h1 className="text-2xl font-extrabold text-foreground">
+                «{search}»
+              </h1>
+            </>
+          ) : (
             <h1 className="text-2xl font-extrabold text-foreground">
-              «{search}»
+              همه محصولات
             </h1>
-          </>
-        ) : (
-          <h1 className="text-2xl font-extrabold text-foreground">
-            همه محصولات
-          </h1>
-        )}
-
-        <p className="mt-1 text-sm text-muted-foreground">
-          {initialProducts.length} محصول نمایش داده شده
-        </p>
+          )}
+        </div>
+        <ProductSort sort={sort} />
       </div>
 
       <Suspense fallback={<SearchSkeleton />}>

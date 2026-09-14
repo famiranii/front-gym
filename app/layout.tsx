@@ -3,13 +3,27 @@ import "./globals.css";
 import "material-symbols";
 
 import Providers from "@/components/Providers";
-import GetMe from "@/components/featchers/home/GetMe";
 
 export const metadata: Metadata = {
-  title: "آریا اسپرت",
-  description: "فروشگاه تجهیزات ورزشی آریا",
+  metadataBase: new URL("https://cheheltike.com"),
+  title: {
+    default: "چهلتیکه",
+    template: "%s | چهلتیکه",
+  },
+  description: "فروشگاه آنلاین چهلتیکه",
+  applicationName: "چهلتیکه",
+  openGraph: {
+    title: "چهلتیکه",
+    description: "فروشگاه آنلاین چهلتیکه",
+    type: "website",
+    locale: "fa_IR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "چهلتیکه",
+    description: "فروشگاه آنلاین چهلتیکه",
+  },
 };
-
 export default function RootLayout({
   children,
 }: {
@@ -19,10 +33,7 @@ export default function RootLayout({
     <html lang="fa" dir="rtl">
       <body className="min-h-screen text-right">
         <main className="w-full mx-auto">
-          <Providers>
-            <GetMe />
-            {children}
-          </Providers>
+          <Providers>{children}</Providers>
         </main>
       </body>
     </html>

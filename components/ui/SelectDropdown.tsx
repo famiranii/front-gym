@@ -29,20 +29,6 @@ export default function SelectDropdown<T extends string = string>({
 
   const selectedOption = options.find((option) => option.value === value);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   const handleSelect = (option: SelectOption<T>) => {
     onChange(option.value);
     setOpen(false);
