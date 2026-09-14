@@ -1,10 +1,10 @@
 import Link from "next/link";
 import MobileHeader from "./MobileHeader";
 import BottomNav from "./header/bottomNav";
-import SearchBarWrapper from "./header/SearchBarWrapper";
 import CartButton from "./header/CartButton";
 import Image from "next/image";
 import { Vazirmatn } from "next/font/google";
+import SearchBar from "../ui/SearchBar";
 
 const vazir = Vazirmatn({
   subsets: ["arabic"],
@@ -55,7 +55,9 @@ export default function Header() {
               چهل<span className="text-[#FF9F0A]">تیکه</span>
             </h1>{" "}
           </div>
-          <SearchBarWrapper />
+          <div className="w-92">
+            <SearchBar />
+          </div>
         </div>
 
         <div className="flex items-center gap-2">

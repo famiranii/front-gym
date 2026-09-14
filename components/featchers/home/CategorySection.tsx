@@ -1,5 +1,6 @@
 import { api } from "@/lib/api";
 import { Category } from "@/types/category";
+import Link from "next/link";
 
 async function getCategories(): Promise<Category[]> {
   return api.get<Category[]>("/categories");
@@ -12,7 +13,6 @@ export default async function CategoriesSection() {
 
   return (
     <section className="py-10 px-6">
-
       <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide">
         {categories.map((category) => (
           <CategoryItem
@@ -38,7 +38,10 @@ function CategoryItem({
 }) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   return (
-    <div className="flex flex-col items-center gap-3 min-w-[100px] cursor-pointer group">
+    <Link
+      href={`/products?q=${label}`}
+      className="flex flex-col items-center gap-3 min-w-[100px] cursor-pointer group"
+    >
       <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center group-hover:bg-tertiary/10 transition-colors duration-300 border border-transparent group-hover:border-tertiary/30">
         {image ? (
           <img
@@ -57,6 +60,6 @@ function CategoryItem({
       </div>
 
       <span className="text-xs text-muted-foreground">{label}</span>
-    </div>
+    </Link>
   );
 }

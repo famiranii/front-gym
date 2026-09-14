@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import ProductCard from "@/components/ui/ProductCard";
 import { api } from "@/lib/api";
@@ -11,6 +12,9 @@ import Header from "@/components/featchers/admin/product/Header";
 const LIMIT = 20;
 
 export default function Page() {
+  const searchParams = useSearchParams();
+  const q = searchParams.get("q")?.trim() ?? "";
+
   const [products, setProducts] = useState<Product[]>([]);
   const [offset, setOffset] = useState(0);
 
@@ -18,32 +22,19 @@ export default function Page() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  async function getProducts(currentOffset: number) {
-    try {
-      const data: Product[] = await api.get(
-        `/products?limit=${LIMIT}&offset=${currentOffset}`,
-      );
-
-      // محصولات جدید رو به قبلی‌ها اضافه کن
-      setProducts((current) => [...current, ...data]);
-
-      // اگر کمتر از 20 تا برگشت، یعنی دیگه محصولی باقی نمونده
-      if (data.length < LIMIT) {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   useEffect(() => {
-    async function loadInitialProducts() {
+    async function loadProducts() {
       setLoading(true);
+      setProducts([]);
+      setOffset(0);
+      setHasMore(true);
 
       try {
-        const data: Product[] = await api.get(
-          `/products?limit=${LIMIT}&offset=0`,
-        );
+        const endpoint = q
+          ? `/products/search?q=${encodeURIComponent(q)}&limit=${LIMIT}&offset=0`
+          : `/products?limit=${LIMIT}&offset=0`;
+
+        const data: Product[] = await api.get(endpoint);
 
         setProducts(data);
         setOffset(data.length);
@@ -53,13 +44,15 @@ export default function Page() {
         }
       } catch (error) {
         console.error(error);
+        setProducts([]);
+        setHasMore(false);
       } finally {
         setLoading(false);
       }
     }
 
-    loadInitialProducts();
-  }, []);
+    loadProducts();
+  }, [q]);
 
   async function handleLoadMore() {
     if (loadingMore || !hasMore) return;
@@ -67,9 +60,19 @@ export default function Page() {
     try {
       setLoadingMore(true);
 
-      await getProducts(offset);
+      const endpoint = q
+        ? `/products/search?q=${encodeURIComponent(q)}&limit=${LIMIT}&offset=${offset}`
+        : `/products?limit=${LIMIT}&offset=${offset}`;
 
-      setOffset((current) => current + LIMIT);
+      const data: Product[] = await api.get(endpoint);
+
+      setProducts((current) => [...current, ...data]);
+
+      setOffset((current) => current + data.length);
+
+      if (data.length < LIMIT) {
+        setHasMore(false);
+      }
     } catch (error) {
       console.error(error);
     } finally {
@@ -94,34 +97,62 @@ export default function Page() {
   }
 
   if (loading) {
-    return <div className="p-6">در حال بارگذاری...</div>;
+    return (
+      <div>
+        <Header />
+
+        <div className="p-6 mt-20">در حال بارگذاری...</div>
+      </div>
+    );
   }
 
   return (
     <div>
       <Header />
-      <div className="flex flex-wrap gap-5 m-8 justify-center mt-20">
-        {products.map((product) => (
-          <div key={product.id} className="relative shrink-0">
-            <Link href={`/admin/product/new?id=${product.id}`}>
-              <ProductCard product={product} />
-            </Link>
 
-            <button
-              type="button"
-              onClick={() => handleDelete(product.id)}
-              className="absolute left-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-xl bg-destructive text-destructive-foreground shadow-md transition-opacity hover:opacity-90"
-              aria-label="حذف محصول"
-            >
-              <span className="material-symbols-outlined text-[19px]">
-                delete
-              </span>
-            </button>
-          </div>
-        ))}
-      </div>
-      {hasMore && (
-        <div className="mt-8 flex justify-center">
+      {q && (
+        <div className="mx-8 mt-20">
+          <p className="text-sm text-muted-foreground">نتایج جستجو برای:</p>
+
+          <h1 className="mt-1 text-xl font-bold text-foreground">«{q}»</h1>
+        </div>
+      )}
+
+      {products.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-32 text-center">
+          <span className="material-symbols-outlined text-6xl text-muted-foreground/30">
+            search_off
+          </span>
+
+          <p className="mt-4 font-bold text-foreground">
+            {q ? `محصولی برای «${q}» پیدا نشد` : "محصولی وجود ندارد"}
+          </p>
+        </div>
+      ) : (
+        <div className="mt-20 flex flex-wrap justify-center gap-5 m-8">
+          {products.map((product) => (
+            <div key={product.id} className="relative shrink-0 max-w-76 mx-5">
+              <Link href={`/admin/product/new?id=${product.id}`}>
+                <ProductCard product={product} />
+              </Link>
+
+              <button
+                type="button"
+                onClick={() => handleDelete(product.id)}
+                className="absolute left-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-xl bg-destructive text-destructive-foreground shadow-md transition-opacity hover:opacity-90"
+                aria-label="حذف محصول"
+              >
+                <span className="material-symbols-outlined text-[19px]">
+                  delete
+                </span>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {hasMore && products.length > 0 && (
+        <div className="mt-8 flex justify-center pb-10">
           <button
             type="button"
             onClick={handleLoadMore}
