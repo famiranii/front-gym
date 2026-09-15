@@ -9,7 +9,6 @@ export default function HomePage() {
       <main className="pb-24 md:pb-0">
         <CategoriesSection />
         <HeroSection />
-        <GetMe />
         <NewArrivalsSection text="تازه های فروشگاه" sort="newest" />
         <NewArrivalsSection text="پرتخفیف های فروشگاه" sort="discount" />
       </main>

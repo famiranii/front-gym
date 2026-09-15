@@ -4,8 +4,9 @@ import "material-symbols";
 
 import Providers from "@/components/Providers";
 
+const url = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cheheltike.com"),
+  metadataBase: new URL(url),
   title: {
     default: "چهلتیکه",
     template: "%s | چهلتیکه",

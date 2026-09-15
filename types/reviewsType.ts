@@ -7,4 +7,5 @@ export type ReviewType = {
   created_at: string;
   updated_at: string;
   product_id: string;
+  status: string;
 };

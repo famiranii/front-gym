@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { api } from "@/lib/api";
+import { useAppSelector } from "@/store/hook";
 import { ReviewType } from "@/types/reviewsType";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function ReviewCard({
   review,
@@ -10,21 +13,26 @@ export default function ReviewCard({
   review: ReviewType;
   onDelete?: (id: number) => void;
 }) {
+  const userId = useAppSelector((state) => state.users.me?.id);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   async function handleDelete() {
-    const confirmed = window.confirm("آیا از حذف این نظر مطمئن هستید؟");
-
-    if (!confirmed) return;
-
     try {
+      setDeleting(true);
+
       const res = await api.delete(
         `/products/${review.product_id}/reviews?user_id=${review.user_id}`,
       );
       console.log(res);
       // فقط بعد از موفقیت API، UI را تغییر بده
       onDelete?.(review.id);
+      setConfirmOpen(false);
     } catch (error) {
       console.error(error);
-      alert("حذف نظر با خطا مواجه شد.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -48,19 +56,36 @@ export default function ReviewCard({
           <p className="text-xs text-muted-foreground">{formattedDate}</p>
         </div>
 
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-          aria-label="حذف نظر"
-        >
-          <span className="material-symbols-outlined text-[20px]">delete</span>
-        </button>
+        {review.user_id === userId && (
+          <button
+            type="button"
+            onClick={() => setConfirmOpen(true)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            aria-label="حذف نظر"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              delete
+            </span>
+          </button>
+        )}
       </div>
 
       <p className="text-sm leading-relaxed text-muted-foreground">
         {review.body}
       </p>
+
+      <ConfirmModal
+        open={confirmOpen}
+        variant="danger"
+        icon="delete"
+        title="حذف نظر"
+        description="آیا از حذف این نظر مطمئن هستید؟"
+        confirmText="حذف"
+        cancelText="انصراف"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

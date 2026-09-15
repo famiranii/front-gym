@@ -53,7 +53,6 @@ export default function LoginPage() {
         !redirect.startsWith("/register") &&
         !redirect.startsWith("/login")
       ) {
-        router.replace(redirect);
       } else {
         router.replace("/");
       }

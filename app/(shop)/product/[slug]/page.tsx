@@ -8,23 +8,26 @@ import { api } from "@/lib/api";
 import { notFound } from "next/navigation";
 import { Product } from "@/types/product-detail";
 import { cookies } from "next/headers";
+import BreadcrumbJsonLd from "@/components/seo/BreadcrumbItem";
 
 interface Props {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; id: string }>;
 }
 
-const getProduct = cache(async (slug: string) => {
+const getProduct = cache(async (id: string) => {
   const cookieStore = await cookies();
 
-  return api.get<Product>(`/products/${slug}`, cookieStore.toString());
+  return api.get<Product>(`/products/${id}`, cookieStore.toString());
 });
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-
+export async function generateMetadata({
+  searchParams,
+}: Props): Promise<Metadata> {
+  const { id } = await searchParams;
   try {
-    const product = await getProduct(slug);
+    const product = await getProduct(id);
+    console.log(product);
 
     const description =
       product.description?.trim() || `خرید ${product.name} از فروشگاه چهلتیکه`;
@@ -33,13 +36,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: product.name,
       description,
       alternates: {
-        canonical: `/product/${slug}`,
+        canonical: `/product/${id}`,
       },
       openGraph: {
         title: product.name,
         description,
         type: "website",
-        url: `/product/${slug}`,
+        url: `/product/${id}`,
         images: product.images?.[0]?.url
           ? [
               {
@@ -68,13 +71,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ProductPage({ params, searchParams }: Props) {
-  const { slug } = await params;
   const { tab } = await searchParams;
-
+  const { id } = await searchParams;
+  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   let product: Product;
 
   try {
-    product = await getProduct(slug);
+    product = await getProduct(id);
   } catch {
     notFound();
   }
@@ -100,7 +103,7 @@ export default async function ProductPage({ params, searchParams }: Props) {
     category: product.category || undefined,
     offers: {
       "@type": "Offer",
-      url: `https://cheheltike.com/product/${product.slug}`,
+      url: `${url}//product/${product.slug}`,
       price: product.final_price,
       availability:
         totalStock > 0
@@ -122,6 +125,21 @@ export default async function ProductPage({ params, searchParams }: Props) {
 
   return (
     <>
+      <BreadcrumbJsonLd
+        items={[
+          {
+            name: "خانه",
+            url: "${url}/",
+          },
+          {
+            name: product.category,
+            url: `${url}//category/${encodeURIComponent(product.category)}`,
+          },
+          {
+            name: product.name,
+          },
+        ]}
+      />
       <main className="min-h-screen pb-24 md:pb-10">
         <div className="px-5 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-4">

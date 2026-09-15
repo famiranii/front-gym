@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   clearCartApi,
   getCartApi,
@@ -9,6 +9,7 @@ import { CartItemType } from "@/types/cartTypes";
 import { useAppDispatch, useAppSelector } from "@/store/hook";
 import CartItem from "@/components/featchers/cart/CartItem";
 import PrimaryButton from "@/components/ui/PrimaryButton";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import Link from "next/link";
 import { GetMeApi } from "@/store/slices/getMeSlice";
 
@@ -17,6 +18,9 @@ export default function Page() {
 
   const items = useAppSelector((state) => state.cart.items);
   const loading = useAppSelector((state) => state.cart.loading);
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   useEffect(() => {
     dispatch(getCartApi());
@@ -38,18 +42,17 @@ export default function Page() {
     [items],
   );
   const handleClearCart = async () => {
-    const confirmed = window.confirm(
-      "آیا مطمئن هستید که می‌خواهید تمام محصولات سبد خرید را حذف کنید؟",
-    );
-
-    if (!confirmed) return;
+    setClearing(true);
 
     try {
       await dispatch(clearCartApi()).unwrap();
-      dispatch(GetMeApi())
+      dispatch(GetMeApi());
+      setConfirmOpen(false);
       // toast.success("سبد خرید با موفقیت خالی شد");
     } catch (error) {
       // toast.error(String(error));
+    } finally {
+      setClearing(false);
     }
   };
 
@@ -78,7 +81,7 @@ export default function Page() {
         {items.length > 0 && (
           <button
             type="button"
-            onClick={handleClearCart}
+            onClick={() => setConfirmOpen(true)}
             className="group flex items-center gap-2 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-2.5 text-sm font-bold text-destructive transition-all hover:border-destructive/30 hover:bg-destructive/10 active:scale-[0.97]"
           >
             <span className="material-symbols-outlined text-[20px] transition-transform group-hover:scale-110">
@@ -167,6 +170,19 @@ export default function Page() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        open={confirmOpen}
+        variant="danger"
+        icon="delete_sweep"
+        title="حذف سبد خرید"
+        description="آیا مطمئن هستید که می‌خواهید تمام محصولات سبد خرید را حذف کنید؟"
+        confirmText="حذف همه"
+        cancelText="انصراف"
+        loading={clearing}
+        onConfirm={handleClearCart}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

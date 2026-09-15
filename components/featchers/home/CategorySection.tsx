@@ -39,7 +39,7 @@ function CategoryItem({
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   return (
     <Link
-      href={`/products?q=${label}`}
+      href={`/categories/${label}`}
       className="flex flex-col items-center gap-3 min-w-[100px] cursor-pointer group"
     >
       <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center group-hover:bg-tertiary/10 transition-colors duration-300 border border-transparent group-hover:border-tertiary/30">

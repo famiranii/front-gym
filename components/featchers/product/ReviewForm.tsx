@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import StarRating from "./StarRating";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { ReviewType } from "@/types/reviewsType";
 import { useAppSelector } from "@/store/hook";
@@ -14,16 +14,14 @@ export default function ReviewForm({
   onClose: () => void;
   onSuccess?: () => void;
 }) {
-  const params = useParams();
-  const productId = params.slug;
+  const params = useSearchParams();
+  const productId = params.get("id");
   const [rating, setRating] = useState(0);
   const [body, setBody] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const user_id = useAppSelector((state) => state.users.me?.id);
-
-  const currentPath = window.location.pathname + window.location.search;
 
   // if () {
   //   return (
@@ -60,7 +58,9 @@ export default function ReviewForm({
         <span className="material-symbols-outlined text-4xl text-success">
           check_circle
         </span>
-        <p className="font-bold text-foreground">نظر شما ثبت شد منتظر تایید باشید</p>
+        <p className="font-bold text-foreground">
+          نظر شما ثبت شد منتظر تایید باشید
+        </p>
         <button
           onClick={onClose}
           className="mt-2 text-sm font-semibold text-accent hover:underline"

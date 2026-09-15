@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 import ProductCard from "@/components/ui/ProductCard";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { api } from "@/lib/api";
 import { Product } from "@/types/product";
 import Header from "@/components/featchers/admin/product/Header";
@@ -21,6 +22,9 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function loadProducts() {
@@ -80,19 +84,23 @@ export default function Page() {
     }
   }
 
-  async function handleDelete(productId: string) {
-    const confirmed = window.confirm("آیا از حذف این محصول مطمئن هستید؟");
-
-    if (!confirmed) return;
+  async function handleDelete() {
+    if (!deleteTarget) return;
 
     try {
-      await api.delete(`/products/${productId}`);
+      setDeleting(true);
+
+      await api.delete(`/products/${deleteTarget}`);
 
       setProducts((current) =>
-        current.filter((product) => product.id !== productId),
+        current.filter((product) => product.id !== deleteTarget),
       );
+
+      setDeleteTarget(null);
     } catch (error) {
       console.error(error);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -138,7 +146,7 @@ export default function Page() {
 
               <button
                 type="button"
-                onClick={() => handleDelete(product.id)}
+                onClick={() => setDeleteTarget(product.id)}
                 className="absolute left-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-xl bg-destructive text-destructive-foreground shadow-md transition-opacity hover:opacity-90"
                 aria-label="حذف محصول"
               >
@@ -177,6 +185,19 @@ export default function Page() {
           </button>
         </div>
       )}
+
+      <ConfirmModal
+        open={deleteTarget !== null}
+        variant="danger"
+        icon="delete"
+        title="حذف محصول"
+        description="آیا از حذف این محصول مطمئن هستید؟"
+        confirmText="حذف"
+        cancelText="انصراف"
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

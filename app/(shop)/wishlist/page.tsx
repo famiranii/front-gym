@@ -8,16 +8,15 @@ import {
   removeFromWishlist,
 } from "@/store/slices/wishlistSlice";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Page() {
   const dispatch = useAppDispatch();
 
-  const wishList = useAppSelector(
-    (state) => state.wishlist.items
-  );
+  const wishList = useAppSelector((state) => state.wishlist.items);
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
-    null
+    null,
   );
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -48,7 +47,6 @@ export default function Page() {
   return (
     <main className="min-h-screen bg-background" dir="rtl">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -87,42 +85,26 @@ export default function Page() {
             </h2>
 
             <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-              محصولاتی که دوست دارید را به علاقه‌مندی‌ها اضافه کنید تا
-              بعداً سریع‌تر به آن‌ها دسترسی داشته باشید.
+              محصولاتی که دوست دارید را به علاقه‌مندی‌ها اضافه کنید تا بعداً
+              سریع‌تر به آن‌ها دسترسی داشته باشید.
             </p>
           </div>
         ) : (
           /* Products */
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mt-20 flex flex-wrap justify-center gap-5 m-8">
             {wishList.map((product) => (
-              <div
-                key={product.id}
-                className="group relative"
-              >
-                <ProductCard product={product} />
+              <div key={product.id} className="relative shrink-0 max-w-76 mx-5">
+                <Link href={`/product/${product.name}?id=${product.id}`}>
+                  <ProductCard product={product} />
+                </Link>
 
-                {/* Delete button */}
                 <button
                   type="button"
                   onClick={() => handleDeleteClick(product.id)}
-                  aria-label="حذف از علاقه‌مندی‌ها"
-                  className="
-                    absolute bottom-16 left-4
-                    flex h-10 w-10 items-center justify-center
-                    rounded-xl
-                    border border-destructive/20
-                    bg-background/95
-                    text-destructive
-                    shadow-sm
-                    backdrop-blur
-                    transition-all
-                    hover:bg-destructive
-                    hover:text-destructive-foreground
-                    hover:shadow-md
-                    active:scale-95
-                  "
+                  className="absolute left-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-xl bg-destructive text-destructive-foreground shadow-md transition-opacity hover:opacity-90"
+                  aria-label="حذف محصول"
                 >
-                  <span className="material-symbols-outlined text-[20px]">
+                  <span className="material-symbols-outlined text-[19px]">
                     delete
                   </span>
                 </button>
