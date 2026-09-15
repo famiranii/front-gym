@@ -109,6 +109,15 @@ export default function LoginPage() {
             inputClassName={darkInput}
           />
 
+          <div className="text-left -mt-1">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-white/50 hover:text-white underline decoration-white/20 underline-offset-4 transition-all"
+            >
+              رمز عبور را فراموش کرده‌اید؟
+            </Link>
+          </div>
+
           {errors.root && (
             <p className="text-xs text-red-400 text-right">
               {errors.root.message}

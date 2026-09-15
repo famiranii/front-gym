@@ -24,12 +24,18 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterSchema) => {
     try {
-      await api.post("/register", {
-        full_name: data.full_name,
-        phone: data.phone,
-        password: data.password,
-      });
-      router.push("/login");
+      await api.post(
+        "/register/otp",
+        {
+          full_name: data.full_name,
+          phone: data.phone,
+          password: data.password,
+        },
+        undefined,
+        true,
+      );
+      // کد تایید ارسال شد؛ برو به صفحه تایید شماره
+      router.push(`/verify?phone=${encodeURIComponent(data.phone)}`);
     } catch (err) {
       console.error(err);
     }
