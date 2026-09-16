@@ -111,109 +111,110 @@ export default function Footer() {
               ))}
             </div>
           </div>
+          <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-4">
+            <nav aria-label="لینک‌های فروشگاه">
+              <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
+                فروشگاه
+              </h3>
 
-          <nav aria-label="لینک‌های فروشگاه">
-            <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
-              فروشگاه
-            </h3>
-
-            <ul className="flex flex-col gap-2.5">
-              {links.shop.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-secondary-foreground/70 transition-colors hover:text-secondary-foreground hover:underline hover:underline-offset-4"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label="لینک‌های حساب کاربری">
-            <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
-              حساب کاربری
-            </h3>
-
-            <ul className="flex flex-col gap-2.5">
-              {links.account.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-secondary-foreground/70 transition-colors hover:text-secondary-foreground hover:underline hover:underline-offset-4"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <nav aria-label="لینک‌های اطلاعات">
-            <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
-              اطلاعات
-            </h3>
-
-            <ul className="flex flex-col gap-2.5">
-              {links.info.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-secondary-foreground/70 transition-colors hover:text-secondary-foreground hover:underline hover:underline-offset-4"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <div>
-            <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
-              ارتباط با ما
-            </h3>
-
-            <div className="flex flex-col gap-4">
-              <div>
-                <p className="mb-1 text-xs text-secondary-foreground/50">
-                  آدرس فروشگاه
-                </p>
-                <p className="text-sm leading-6 text-secondary-foreground/80">
-                  منیریه، پاساژ تابان، طبقه دو
-                </p>
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs text-secondary-foreground/50">
-                  شماره تماس
-                </p>
-
-                <div className="flex flex-col gap-2">
-                  {contacts.map((contact) => (
-                    <a
-                      key={contact.phone}
-                      href={`tel:${contact.phone}`}
-                      dir="rtl"
-                      className="flex flex-col gap-0.5 text-sm text-secondary-foreground/80 transition-colors hover:text-secondary-foreground"
+              <ul className="flex flex-col gap-2.5">
+                {links.shop.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-secondary-foreground/70 transition-colors hover:text-secondary-foreground hover:underline hover:underline-offset-4"
                     >
-                      <span className="text-xs text-secondary-foreground/50">
-                        {contact.name}
-                      </span>
-                      <span dir="ltr" className="text-right">
-                        {contact.phone}
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
-              <Link
-                href="/contact"
-                className="text-sm font-bold text-primary transition-opacity hover:opacity-80"
-              >
-                صفحه تماس با ما
-              </Link>
+            <nav aria-label="لینک‌های حساب کاربری">
+              <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
+                حساب کاربری
+              </h3>
+
+              <ul className="flex flex-col gap-2.5">
+                {links.account.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-secondary-foreground/70 transition-colors hover:text-secondary-foreground hover:underline hover:underline-offset-4"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <nav aria-label="لینک‌های اطلاعات">
+              <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
+                اطلاعات
+              </h3>
+
+              <ul className="flex flex-col gap-2.5">
+                {links.info.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-secondary-foreground/70 transition-colors hover:text-secondary-foreground hover:underline hover:underline-offset-4"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div>
+              <h3 className="mb-4 text-sm font-bold text-secondary-foreground">
+                ارتباط با ما
+              </h3>
+
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="mb-1 text-xs text-secondary-foreground/50">
+                    آدرس فروشگاه
+                  </p>
+                  <p className="text-sm leading-6 text-secondary-foreground/80">
+                    منیریه، پاساژ تابان، طبقه دو
+                  </p>
+                </div>
+
+                <div>
+                  <p className="mb-2 text-xs text-secondary-foreground/50">
+                    شماره تماس
+                  </p>
+
+                  <div className="flex flex-col gap-4 col-span-2 sm:col-span-2 lg:col-span-1">
+                    {contacts.map((contact) => (
+                      <a
+                        key={contact.phone}
+                        href={`tel:${contact.phone}`}
+                        dir="rtl"
+                        className="flex flex-col gap-0.5 text-sm text-secondary-foreground/80 transition-colors hover:text-secondary-foreground"
+                      >
+                        <span className="text-xs text-secondary-foreground/50">
+                          {contact.name}
+                        </span>
+                        <span dir="ltr" className="text-right">
+                          {contact.phone}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                <Link
+                  href="/contact"
+                  className="text-sm font-bold text-primary transition-opacity hover:opacity-80"
+                >
+                  صفحه تماس با ما
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -226,7 +227,14 @@ export default function Footer() {
           </p>
 
           <p className="text-xs text-secondary-foreground/50">
-            ساخته‌شده با ❤️ در ایران
+            ساخته‌شده با ❤️ توسط{" "}
+            <a
+              href="https://github.com/famiranii"
+              target="_blank"
+              className="hover:text-secondary-foreground transition-colors"
+            >
+              فرهاد امیرانی
+            </a>
           </p>
         </div>
       </div>

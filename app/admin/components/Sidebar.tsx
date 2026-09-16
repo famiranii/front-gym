@@ -11,6 +11,7 @@ const navItems = [
   { label: "نظرات", icon: "reviews", href: "/admin/reviews" },
   { label: "کاربران", icon: "group", href: "/admin/customers" },
   { label: "دسته بندی ", icon: "folder", href: "/admin/categories" },
+  { label: "تنظیمات", icon: "settings", href: "/admin/settings" },
 ];
 
 export default function Sidebar() {
