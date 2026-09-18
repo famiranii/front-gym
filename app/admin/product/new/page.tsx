@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+
 import { useRouter, useSearchParams } from "next/navigation";
+
 import { Controller, useForm } from "react-hook-form";
+
+import { toast } from "sonner";
 
 import ImageUpload from "@/components/ui/ImageUpload";
 import AttributesPicker, { Variant } from "@/components/ui/AttributesPicker";
@@ -41,23 +45,18 @@ const defaultValues: ProductFormData = {
 export default function AddProductForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const productId = searchParams.get("id");
   const isEditMode = Boolean(productId);
 
   const dispatch = useAppDispatch();
+
   const categories = useAppSelector((state) => {
-    console.log(
-      "items type:",
-      typeof state.categories?.items,
-      Array.isArray(state.categories?.items),
-    );
     return (state.categories?.items ?? []).map((category) => ({
       value: category.id,
       label: category.name,
     }));
   });
-  
+
   const {
     register,
     control,
@@ -96,6 +95,8 @@ export default function AddProductForm() {
         });
       } catch (error) {
         console.error("Failed to fetch product:", error);
+
+        toast.error("دریافت اطلاعات محصول با خطا مواجه شد");
       }
     }
 
@@ -106,13 +107,23 @@ export default function AddProductForm() {
     try {
       if (isEditMode && productId) {
         await api.put(`/products/${productId}`, data);
+
+        toast.success("محصول با موفقیت ویرایش شد");
       } else {
         await api.post("/products", data);
+
+        toast.success("محصول با موفقیت ثبت شد");
       }
 
       router.push("/admin/products");
     } catch (error) {
       console.error("Failed to save product:", error);
+
+      toast.error(
+        isEditMode
+          ? "ویرایش محصول با خطا مواجه شد"
+          : "ثبت محصول با خطا مواجه شد",
+      );
     }
   }
 

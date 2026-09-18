@@ -3,6 +3,7 @@ import "./globals.css";
 import "material-symbols";
 
 import Providers from "@/components/Providers";
+import { Toaster } from "sonner";
 
 const url = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
@@ -34,7 +35,10 @@ export default function RootLayout({
     <html lang="fa" dir="rtl">
       <body className="min-h-screen text-right">
         <main className="w-full mx-auto">
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+            <Toaster position="bottom-left" dir="rtl" richColors closeButton />
+          </Providers>
         </main>
       </body>
     </html>

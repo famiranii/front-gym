@@ -12,6 +12,7 @@ import PrimaryButton from "@/components/ui/PrimaryButton";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import Link from "next/link";
 import { GetMeApi } from "@/store/slices/getMeSlice";
+import { toast } from "sonner";
 
 export default function Page() {
   const dispatch = useAppDispatch();
@@ -48,9 +49,9 @@ export default function Page() {
       await dispatch(clearCartApi()).unwrap();
       dispatch(GetMeApi());
       setConfirmOpen(false);
-      // toast.success("سبد خرید با موفقیت خالی شد");
+      toast.success("سبد خرید با موفقیت خالی شد");
     } catch (error) {
-      // toast.error(String(error));
+      toast.error("مشکلی در ارتباط با سیستم پیش امده");
     } finally {
       setClearing(false);
     }

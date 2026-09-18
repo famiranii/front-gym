@@ -6,6 +6,7 @@ import ImageUpload from "@/components/ui/ImageUpload";
 import FormInput from "@/components/ui/FormInput";
 import { api } from "@/lib/api";
 import SingleImageUpload from "@/components/ui/SingleImageUpload";
+import { toast } from "sonner";
 
 type Banner = {
   id: string;
@@ -64,9 +65,10 @@ export default function SettingPage() {
     try {
       const banner = await api.post<Banner>("/banners", data);
       setBanners((prev) => [...prev, banner]);
+      toast.success("با موفقیت اضافه شد")
       reset();
     } catch {
-      alert("خطا در ثبت بنر");
+      toast.error("خطا در ثبت بنر");
     } finally {
       setSubmitting(false);
     }

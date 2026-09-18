@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { api } from "@/lib/api";
+
 import SingleImageUpload from "@/components/ui/SingleImageUpload";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+
 import { Category } from "@/types/category";
+import { toast } from "sonner";
 
 type CategoryFormData = {
   name: string;
@@ -23,7 +28,13 @@ export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
+    null,
+  );
+
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<CategoryFormData>(defaultForm);
   const [error, setError] = useState("");
@@ -34,40 +45,76 @@ export default function CategoriesPage() {
         const data = await api.get<Category[]>("/categories");
         setCategories(data);
       } catch {
-        setError("خطا در دریافت دسته‌بندی‌ها");
+        toast.error("خطا در دریافت دسته‌بندی‌ها");
       } finally {
         setLoading(false);
       }
     }
+
     fetchCategories();
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     if (!form.name.trim()) return;
 
     setSubmitting(true);
     setError("");
+
     try {
-      await api.post("/categories", {
+      const res = await api.post<Category>("/categories", {
         name: form.name,
         ...(form.parent_id ? { parent_id: form.parent_id } : {}),
         ...(form.image_url ? { image_url: form.image_url } : {}),
       });
+
+      setCategories((prev) => [...prev, res]);
+
       setForm(defaultForm);
       setShowForm(false);
-    } catch {
-      setError("خطا در ایجاد دسته‌بندی");
+    } catch (err: unknown) {
+      if (
+        err instanceof Error &&
+        err.message === "category name already exists"
+      ) {
+        setError("این دسته‌بندی تکراری می‌باشد");
+      } else {
+        setError("خطا در ایجاد دسته‌بندی");
+      }
     } finally {
       setSubmitting(false);
     }
   }
 
-  async function handleDelete(id: string) {
+  function openDeleteModal(category: Category) {
+    setCategoryToDelete(category);
+    setDeleteModalOpen(true);
+    setError("");
+  }
+
+  function closeDeleteModal() {
+    if (deletingId) return;
+
+    setDeleteModalOpen(false);
+    setCategoryToDelete(null);
+  }
+
+  async function handleDelete() {
+    if (!categoryToDelete) return;
+
+    const id = categoryToDelete.id;
+
     setDeletingId(id);
+    setError("");
+
     try {
       await api.delete(`/categories/${id}`);
+
       setCategories((prev) => prev.filter((c) => c.id !== id));
+
+      setDeleteModalOpen(false);
+      setCategoryToDelete(null);
     } catch {
       setError("خطا در حذف دسته‌بندی");
     } finally {
@@ -83,6 +130,7 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground">دسته‌بندی‌ها</h1>
+
         <button
           onClick={() => {
             setShowForm((p) => !p);
@@ -94,10 +142,12 @@ export default function CategoriesPage() {
           <span className="material-symbols-outlined text-[18px]">
             {showForm ? "close" : "add"}
           </span>
+
           {showForm ? "انصراف" : "دسته‌بندی جدید"}
         </button>
       </div>
 
+      {/* Error */}
       {error && (
         <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
           {error}
@@ -120,47 +170,34 @@ export default function CategoriesPage() {
               <label className="text-xs font-medium text-muted-foreground">
                 نام دسته‌بندی <span className="text-destructive">*</span>
               </label>
+
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) =>
-                  setForm((p) => ({ ...p, name: e.target.value }))
+                  setForm((p) => ({
+                    ...p,
+                    name: e.target.value,
+                  }))
                 }
                 placeholder="مثال: فوتبال"
                 className="rounded-xl border border-border bg-muted px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/30"
               />
             </div>
 
-            {/* Parent */}
-            {/* <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-muted-foreground">
-                دسته‌بندی والد
-              </label>
-              <select
-                value={form.parent_id}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, parent_id: e.target.value }))
-                }
-                className="rounded-xl border border-border bg-muted px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary/30"
-              >
-                <option value="">بدون والد</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div> */}
-
-            {/* Image URL */}
-            <div className="flex flex-col gap-1.5 md:col-span-2 w-100">
+            {/* Image */}
+            <div className="flex w-100 flex-col gap-1.5 md:col-span-2">
               <label className="text-xs font-medium text-muted-foreground">
                 تصویر دسته‌بندی
               </label>
+
               <SingleImageUpload
                 value={form.image_url || null}
                 onChange={(url) =>
-                  setForm((p) => ({ ...p, image_url: url ?? "" }))
+                  setForm((p) => ({
+                    ...p,
+                    image_url: url ?? "",
+                  }))
                 }
               />
             </div>
@@ -188,6 +225,7 @@ export default function CategoriesPage() {
       ) : categories.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
           <span className="material-symbols-outlined text-4xl">folder_off</span>
+
           <p className="text-sm">هیچ دسته‌بندی‌ای وجود ندارد</p>
         </div>
       ) : (
@@ -200,7 +238,7 @@ export default function CategoriesPage() {
               {/* Image */}
               {cat.image_url ? (
                 <img
-                  src={apiUrl+ cat.image_url}
+                  src={apiUrl + cat.image_url}
                   alt={cat.name}
                   className="h-10 w-10 rounded-xl object-cover"
                 />
@@ -217,6 +255,7 @@ export default function CategoriesPage() {
                 <span className="text-sm font-semibold text-foreground">
                   {cat.name}
                 </span>
+
                 {parentName(cat.parent_id) && (
                   <span className="text-xs text-muted-foreground">
                     زیرمجموعه {parentName(cat.parent_id)}
@@ -226,10 +265,11 @@ export default function CategoriesPage() {
 
               {/* Delete */}
               <button
-                onClick={() => handleDelete(cat.id)}
+                type="button"
+                onClick={() => openDeleteModal(cat)}
                 disabled={deletingId === cat.id}
                 className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
-                aria-label="حذف"
+                aria-label={`حذف ${cat.name}`}
               >
                 {deletingId === cat.id ? (
                   <span className="material-symbols-outlined animate-spin text-[18px]">
@@ -245,6 +285,26 @@ export default function CategoriesPage() {
           ))}
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        open={deleteModalOpen}
+        title="حذف دسته‌بندی"
+        description="آیا از حذف این دسته‌بندی مطمئن هستید؟ این عملیات قابل بازگشت نیست."
+        confirmText="حذف"
+        cancelText="انصراف"
+        variant="danger"
+        icon="delete"
+        loading={deletingId !== null}
+        onConfirm={handleDelete}
+        onCancel={closeDeleteModal}
+      >
+        {categoryToDelete && (
+          <div className="rounded-xl bg-muted px-4 py-3">
+            <span className="font-semibold">{categoryToDelete.name}</span>
+          </div>
+        )}
+      </ConfirmModal>
     </div>
   );
 }

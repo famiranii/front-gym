@@ -43,8 +43,7 @@ export default function CheckoutPage() {
 
   const defaultAddress = addresses.find((addr) => addr.is_default);
 
-  const currentSelectedAddress =
-    selectedAddress || defaultAddress?.id || "";
+  const currentSelectedAddress = selectedAddress || defaultAddress?.id || "";
 
   useEffect(() => {
     if (!me?.id) return;
@@ -82,24 +81,17 @@ export default function CheckoutPage() {
   );
 
   const summary: CartSummary = {
-    total: cartItems.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0,
-    ),
+    total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     discount: cartItems.reduce(
-      (sum, item) =>
-        sum + (item.price - item.final_price) * item.quantity,
+      (sum, item) => sum + (item.price - item.final_price) * item.quantity,
       0,
     ),
     payable: itemsTotal,
-    count: cartItems.reduce(
-      (sum, item) => sum + item.quantity,
-      0,
-    ),
+    count: cartItems.reduce((sum, item) => sum + item.quantity, 0),
   };
 
   const handleSubmit = () => {
-    if (!currentSelectedAddress) return;
+    if (!currentSelectedAddress || orderLoading) return;
 
     dispatch(
       createOrderApi({
@@ -111,21 +103,14 @@ export default function CheckoutPage() {
   if (cartItems.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-muted-foreground">
-          سبد خرید شما خالی است
-        </p>
+        <p className="text-muted-foreground">سبد خرید شما خالی است</p>
       </div>
     );
   }
 
   return (
-    <div
-      className="max-w-4xl mx-auto px-4 py-8"
-      dir="rtl"
-    >
-      <h1 className="text-2xl font-bold mb-8 text-foreground">
-        تکمیل سفارش
-      </h1>
+    <div className="max-w-4xl mx-auto px-4 py-8" dir="rtl">
+      <h1 className="text-2xl font-bold mb-8 text-foreground">تکمیل سفارش</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-4">
@@ -135,10 +120,7 @@ export default function CheckoutPage() {
             </h2>
 
             {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4"
-              >
+              <div key={item.id} className="flex items-center gap-4">
                 {item.image_url && (
                   <img
                     src={`${process.env.NEXT_PUBLIC_API_URL}${item.image_url}`}
@@ -148,9 +130,7 @@ export default function CheckoutPage() {
                 )}
 
                 <div className="flex-1">
-                  <p className="font-semibold text-foreground">
-                    {item.name}
-                  </p>
+                  <p className="font-semibold text-foreground">{item.name}</p>
 
                   <p className="text-sm text-muted-foreground">
                     سایز: {item.label} | تعداد: {item.quantity}
@@ -158,9 +138,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <p className="font-bold text-sm text-primary">
-                  {formatPrice(
-                    item.final_price * item.quantity,
-                  )}
+                  {formatPrice(item.final_price * item.quantity)}
                 </p>
               </div>
             ))}

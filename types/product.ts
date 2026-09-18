@@ -8,6 +8,7 @@ export type Product = {
   primary_image: string | null;
   is_active: boolean;
   created_at: string;
+  rating: number;
 };
 export type VariantFormData = {
   label: string;
@@ -70,7 +71,6 @@ export const BRANDS: SelectOption[] = [
 
 // src/types/product.ts
 
-
 export const COLORS = [
   {
     label: "مشکی",
@@ -113,6 +113,5 @@ export const COLORS = [
     value: "#F5F5DC",
   },
 ] as const;
-
 
 export type ProductColor = (typeof COLORS)[number]["value"];
