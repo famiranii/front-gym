@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import HeroSection from "@/components/featchers/home/HeroSection";
 import CategoriesSection from "@/components/featchers/home/CategorySection";
 import NewArrivalsSection from "@/components/featchers/home/NewArrivalsSection";

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ProductImage } from "@/types/product-detail";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 export default function ProductGallery({ images }: { images: ProductImage[] }) {
   const [active, setActive] = useState(0);
@@ -33,7 +34,6 @@ export default function ProductGallery({ images }: { images: ProductImage[] }) {
 
   if (!images?.length) return null;
 
-  const imageUrl = (url: string) => `${process.env.NEXT_PUBLIC_API_URL}${url}`;
 
   return (
     <div className="flex flex-col-reverse md:flex-row gap-3 w-full">
@@ -54,7 +54,7 @@ export default function ProductGallery({ images }: { images: ProductImage[] }) {
             ].join(" ")}
           >
             <img
-              src={imageUrl(img.url)}
+              src={getImageUrl(img.url)}
               alt={`تصویر محصول ${i + 1}`}
               className="w-full h-full object-cover object-center"
             />
@@ -66,7 +66,7 @@ export default function ProductGallery({ images }: { images: ProductImage[] }) {
       <div className="relative h-[50vh] rounded-2xl bg-muted md:flex-1">
         <img
           key={images[active].url}
-          src={imageUrl(images[active].url)}
+          src={getImageUrl(images[active].url)}
           alt="product"
           className={[
             "absolute inset-0 w-full h-full object-cover object-center",

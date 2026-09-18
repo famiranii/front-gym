@@ -1,5 +1,6 @@
 "use client";
 
+import { getImageUrl } from "@/lib/getImageUrl";
 import { Product } from "@/types/product";
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -55,7 +56,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="relative h-64 bg-muted overflow-hidden">
         {product.primary_image ? (
           <img
-            src={`${process.env.NEXT_PUBLIC_API_URL}${product.primary_image}`}
+            src={getImageUrl(product.primary_image)}
             alt={product.name}
             className="
               object-cover

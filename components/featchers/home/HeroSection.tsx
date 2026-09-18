@@ -1,4 +1,5 @@
 import HeroSlider from "./HeroSlider";
+import { api } from "@/lib/api";
 
 type Banner = {
   id: string;
@@ -10,15 +11,17 @@ type Banner = {
 };
 
 async function getBanners(): Promise<Banner[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/banners`, {
-    next: { revalidate: 60 },
-  });
-  if (!res.ok) return [];
-  return res.json();
+  try {
+    return await api.get<Banner[]>("/banners");
+  } catch {
+    return [];
+  }
 }
 
 export default async function HeroSection() {
   const banners = await getBanners();
+
   if (banners.length === 0) return null;
+
   return <HeroSlider banners={banners} />;
 }

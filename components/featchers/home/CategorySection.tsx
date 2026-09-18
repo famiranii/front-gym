@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+import { getImageUrl } from "@/lib/getImageUrl";
 import { Category } from "@/types/category";
 import Link from "next/link";
 
@@ -36,7 +37,6 @@ function CategoryItem({
   icon: string;
   image: string;
 }) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   return (
     <Link
       href={`/categories/${label}`}
@@ -45,7 +45,7 @@ function CategoryItem({
       <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center group-hover:bg-tertiary/10 transition-colors duration-300 border border-transparent group-hover:border-tertiary/30">
         {image ? (
           <img
-            src={apiUrl + image}
+            src={getImageUrl(image)}
             alt={label}
             className="w-full h-full rounded-full object-cover"
           />

@@ -10,6 +10,12 @@ import { api } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import PrimaryButton from "@/components/ui/PrimaryButton";
+import { Vazirmatn } from "next/font/google";
+const vazir = Vazirmatn({
+  subsets: ["arabic"],
+  weight: ["400", "700", "900"],
+});
+
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -59,9 +65,11 @@ export default function RegisterPage() {
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:px-10 border border-white/15">
         {/* Logo */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-white tracking-tighter drop-shadow-md">
-            ARIA SPORT
-          </h1>
+            <h1
+              className={`${vazir.className} text-2xl font-black text-gray-400 tracking-tight`}
+            >
+              چهل<span className="text-[#FF9F0A]">تیکه</span>
+            </h1>
           <div className="w-10 h-0.5 bg-white/40 mx-auto mt-2 rounded-full" />
         </div>
 

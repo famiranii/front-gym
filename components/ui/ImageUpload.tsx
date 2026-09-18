@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 
 import { api } from "@/lib/api";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 type ProductImage = {
   url: string;
@@ -65,7 +66,7 @@ function Slot({ isMain = false, image, onChange }: SlotProps) {
       ) : image ? (
         <>
           <img
-            src={`${process.env.NEXT_PUBLIC_API_URL}${image}`}
+            src={getImageUrl(image)}
             alt="تصویر محصول"
             className="h-full w-full object-cover"
           />

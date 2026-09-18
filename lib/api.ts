@@ -1,7 +1,23 @@
-const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+function getBaseUrl() {
+  // Next.js Server
+  if (typeof window === "undefined") {
+    const url = process.env.INTERNAL_API_URL;
 
-if (!baseUrl) {
-  throw new Error("NEXT_PUBLIC_API_URL is not defined");
+    if (!url) {
+      throw new Error("INTERNAL_API_URL is not defined");
+    }
+
+    return url;
+  }
+
+  // Browser / Client Component
+  const url = process.env.NEXT_PUBLIC_API_URL;
+
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_API_URL is not defined");
+  }
+
+  return url;
 }
 
 type RequestOptions = RequestInit & {
@@ -24,11 +40,12 @@ async function request<T>(
     headers.set("Content-Type", "application/json");
   }
 
+  // فقط برای Server-Side
   if (cookie) {
     headers.set("Cookie", cookie);
   }
 
-  const res = await fetch(`${baseUrl}${endpoint}`, {
+  const res = await fetch(`${getBaseUrl()}${endpoint}`, {
     ...fetchOptions,
     credentials: "include",
     headers,
@@ -36,6 +53,7 @@ async function request<T>(
 
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
+
     if (
       error.error === "access token is required" &&
       !skipAuthRedirect &&
@@ -59,7 +77,11 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(url: string, cookie?: string, skipAuthRedirect = false) =>
+  get: <T>(
+    url: string,
+    cookie?: string,
+    skipAuthRedirect = false,
+  ) =>
     request<T>(url, {
       method: "GET",
       cookie,
@@ -120,7 +142,11 @@ export const api = {
             : undefined,
     }),
 
-  delete: <T>(url: string, cookie?: string, skipAuthRedirect = false) =>
+  delete: <T>(
+    url: string,
+    cookie?: string,
+    skipAuthRedirect = false,
+  ) =>
     request<T>(url, {
       method: "DELETE",
       cookie,

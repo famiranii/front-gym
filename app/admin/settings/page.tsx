@@ -7,6 +7,7 @@ import FormInput from "@/components/ui/FormInput";
 import { api } from "@/lib/api";
 import SingleImageUpload from "@/components/ui/SingleImageUpload";
 import { toast } from "sonner";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 type Banner = {
   id: string;
@@ -160,7 +161,7 @@ export default function SettingPage() {
                 className="flex items-center gap-4 p-3 rounded-xl border border-border bg-muted"
               >
                 <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${banner.image_url}`}
+                  src={getImageUrl(banner.image_url)}
                   alt={banner.title}
                   className="w-20 h-12 object-cover rounded-lg"
                 />

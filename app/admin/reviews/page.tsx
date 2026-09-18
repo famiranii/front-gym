@@ -3,6 +3,7 @@
 import ReviewCard from "@/components/featchers/product/ReviewCard";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { api } from "@/lib/api";
+import { getImageUrl } from "@/lib/getImageUrl";
 import { ReviewType } from "@/types/reviewsType";
 import { useEffect, useRef, useState } from "react";
 
@@ -62,19 +63,17 @@ export default function Page() {
     const search = q.trim();
 
     if (search.length < 2 || selectedProduct?.name === search) {
-      if (search.length < 2) {
-        setProducts([]);
-        setShowDropdown(false);
-      }
       return;
     }
 
     const timer = setTimeout(async () => {
       try {
         setSearchLoading(true);
+
         const data = await api.get<Product[]>(
           `/products/search?q=${encodeURIComponent(search)}&limit=10&offset=0`,
         );
+
         setProducts(data);
         setShowDropdown(data.length > 0);
       } catch {
@@ -97,7 +96,9 @@ export default function Page() {
       setShowDropdown(false);
       setLoading(true);
       setError("");
-      const data = await api.get<ReviewType[]>(`/products/${product.id}/reviews`);
+      const data = await api.get<ReviewType[]>(
+        `/products/${product.id}/reviews`,
+      );
       setReviews(data);
     } catch {
       setReviews([]);
@@ -168,7 +169,10 @@ export default function Page() {
         <div className="h-8 w-52 animate-pulse rounded-lg bg-card" />
         <div className="mt-8 space-y-5">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-44 animate-pulse rounded-2xl border border-border bg-card" />
+            <div
+              key={i}
+              className="h-44 animate-pulse rounded-2xl border border-border bg-card"
+            />
           ))}
         </div>
       </PageShell>
@@ -179,7 +183,9 @@ export default function Page() {
     return (
       <PageShell>
         <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-center">
-          <span className="material-symbols-outlined text-3xl text-destructive">error</span>
+          <span className="material-symbols-outlined text-3xl text-destructive">
+            error
+          </span>
           <p className="mt-2 text-sm text-destructive">{error}</p>
         </div>
       </PageShell>
@@ -209,7 +215,9 @@ export default function Page() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">rate_review</span>
+            <span className="material-symbols-outlined text-primary">
+              rate_review
+            </span>
             <h1 className="text-2xl font-bold text-foreground">بررسی نظرات</h1>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -225,10 +233,19 @@ export default function Page() {
               type="search"
               value={q}
               onChange={(e) => {
-                setQ(e.target.value);
+                const value = e.target.value;
+
+                setQ(value);
+
                 if (selectedProduct) {
                   setSelectedProduct(null);
                   setReviews(pendingReviews);
+                }
+
+                if (value.trim().length < 2) {
+                  setProducts([]);
+                  setShowDropdown(false);
+                  setSearchLoading(false);
                 }
               }}
               onFocus={() => products.length > 0 && setShowDropdown(true)}
@@ -245,7 +262,9 @@ export default function Page() {
                   aria-label="حذف انتخاب"
                   className="flex h-full w-full items-center justify-center transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  <span className="material-symbols-outlined text-[19px]">close</span>
+                  <span className="material-symbols-outlined text-[19px]">
+                    close
+                  </span>
                 </button>
               ) : (
                 <span
@@ -271,13 +290,15 @@ export default function Page() {
                 >
                   {product.primary_image ? (
                     <img
-                      src={process.env.NEXT_PUBLIC_API_URL + product.primary_image}
+                      src={getImageUrl(product.primary_image)}
                       alt={product.name}
                       className="h-10 w-10 shrink-0 rounded-lg object-cover"
                     />
                   ) : (
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                      <span className="material-symbols-outlined text-muted-foreground">image</span>
+                      <span className="material-symbols-outlined text-muted-foreground">
+                        image
+                      </span>
                     </div>
                   )}
                   <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
@@ -292,7 +313,9 @@ export default function Page() {
         {/* Counter */}
         <div className="shrink-0 self-start rounded-xl border border-border bg-card px-4 py-2 sm:self-auto">
           <span className="text-sm text-muted-foreground">در انتظار بررسی</span>
-          <span className="mr-2 font-semibold text-primary">{displayCount}</span>
+          <span className="mr-2 font-semibold text-primary">
+            {displayCount}
+          </span>
         </div>
       </div>
 
@@ -300,7 +323,9 @@ export default function Page() {
       {selectedProduct && (
         <div className="mt-6 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="material-symbols-outlined text-primary">inventory_2</span>
+            <span className="material-symbols-outlined text-primary">
+              inventory_2
+            </span>
             <span className="truncate text-sm font-semibold text-foreground">
               نظرات محصول: {selectedProduct.name}
             </span>
@@ -326,7 +351,10 @@ export default function Page() {
       {loading && selectedProduct ? (
         <div className="mt-8 space-y-5">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-44 animate-pulse rounded-2xl border border-border bg-card" />
+            <div
+              key={i}
+              className="h-44 animate-pulse rounded-2xl border border-border bg-card"
+            />
           ))}
         </div>
       ) : reviews.length === 0 ? (
@@ -335,7 +363,9 @@ export default function Page() {
             mark_email_read
           </span>
           <h2 className="mt-4 font-semibold text-foreground">
-            {selectedProduct ? "نظری برای این محصول وجود ندارد" : "نظری برای بررسی وجود ندارد"}
+            {selectedProduct
+              ? "نظری برای این محصول وجود ندارد"
+              : "نظری برای بررسی وجود ندارد"}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
             {selectedProduct
@@ -360,7 +390,9 @@ export default function Page() {
                       onClick={() => handleReject(review.id)}
                       className="flex h-8 items-center gap-2 rounded-xl border border-destructive/20 bg-destructive/10 px-4 text-sm font-medium text-destructive transition-colors hover:bg-destructive hover:text-white"
                     >
-                      <span className="material-symbols-outlined text-[19px]">close</span>
+                      <span className="material-symbols-outlined text-[19px]">
+                        close
+                      </span>
                       رد کردن
                     </button>
                     <button
@@ -368,7 +400,9 @@ export default function Page() {
                       onClick={() => handleApprove(review.id)}
                       className="flex h-8 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                     >
-                      <span className="material-symbols-outlined text-[19px]">check</span>
+                      <span className="material-symbols-outlined text-[19px]">
+                        check
+                      </span>
                       تایید
                     </button>
                   </>
@@ -379,7 +413,9 @@ export default function Page() {
                     aria-label="حذف نظر"
                     className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                   >
-                    <span className="material-symbols-outlined text-[20px]">delete</span>
+                    <span className="material-symbols-outlined text-[20px]">
+                      delete
+                    </span>
                   </button>
                 )}
               </div>
@@ -395,7 +431,10 @@ export default function Page() {
 
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <main dir="rtl" className="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8">
+    <main
+      dir="rtl"
+      className="min-h-screen bg-background px-4 py-8 sm:px-6 lg:px-8"
+    >
       <div className="mx-auto max-w-5xl">{children}</div>
     </main>
   );

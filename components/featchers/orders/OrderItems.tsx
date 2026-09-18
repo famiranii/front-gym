@@ -1,3 +1,4 @@
+import { getImageUrl } from "@/lib/getImageUrl";
 import { OrderItem } from "@/types/orderTypes";
 
 function formatPrice(n: number) {
@@ -16,7 +17,7 @@ export default function OrderItems({ items }: Props) {
         <div key={item.id} className="flex items-center gap-4">
           {item.image_url && (
             <img
-              src={`${process.env.NEXT_PUBLIC_API_URL}${item.image_url}`}
+              src={getImageUrl(item.image_url)}
               alt={item.product_name}
               className="w-16 h-16 object-cover rounded-xl"
             />

@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import SearchBar from "../ui/SearchBar";
-import CartButton from "./header/CartButton";
 import { Vazirmatn } from "next/font/google";
 
 const vazir = Vazirmatn({

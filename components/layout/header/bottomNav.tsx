@@ -9,7 +9,7 @@ export default function BottomNav() {
   const count = useAppSelector((state) => state.users.me?.cart_length ?? 0);
   const bottomNavItems = [
     { label: "خانه", href: "/", icon: "home" },
-    { label: "فروشگاه", href: "/shop", icon: "grid_view" },
+    { label: "فروشگاه", href: "/products", icon: "grid_view" },
     { label: "سبد", href: "/cart", icon: "shopping_bag", badge: count ?? 0 },
     { label: "سفارشات", href: "/orders", icon: "inventory_2" },
     { label: "پروفایل", href: "/account", icon: "person" },

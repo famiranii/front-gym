@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 type Banner = {
   id: string;
@@ -28,7 +29,7 @@ export default function HeroSlider({ banners }: { banners: Banner[] }) {
   return (
     <section className="relative w-full h-[50vh] md:h-[65vh] overflow-hidden bg-black">
       <img
-        src={`${process.env.NEXT_PUBLIC_API_URL}${banner.image_url}`}
+        src={getImageUrl(banner.image_url)}
         alt={banner.title}
         className="absolute inset-0 w-full h-full object-cover opacity-70 transition-opacity duration-700"
       />

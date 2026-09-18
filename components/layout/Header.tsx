@@ -53,7 +53,7 @@ export default function Header() {
               className={`${vazir.className} text-2xl font-black text-gray-400 tracking-tight`}
             >
               چهل<span className="text-[#FF9F0A]">تیکه</span>
-            </h1>{" "}
+            </h1>
           </div>
           <div className="w-92">
             <SearchBar />

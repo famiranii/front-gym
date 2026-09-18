@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { api } from "@/lib/api";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 interface SingleImageUploadProps {
   value: string | null;
@@ -50,7 +51,7 @@ export default function SingleImageUpload({
       ) : value ? (
         <>
           <img
-            src={`${process.env.NEXT_PUBLIC_API_URL}${value}`}
+            src={getImageUrl(value)}
             alt="تصویر دسته‌بندی"
             className="h-full w-full object-cover"
           />

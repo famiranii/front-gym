@@ -1,5 +1,6 @@
 "use client";
 
+import { getImageUrl } from "@/lib/getImageUrl";
 import { Product } from "@/types/product";
 
 export default function ProductCardMobile({ product }: { product: Product }) {
@@ -19,7 +20,7 @@ export default function ProductCardMobile({ product }: { product: Product }) {
       <div className="relative w-28 h-28 shrink-0 bg-muted overflow-hidden rounded-r-2xl">
         {product.primary_image ? (
           <img
-            src={`${process.env.NEXT_PUBLIC_API_URL}${product.primary_image}`}
+            src={getImageUrl(product.primary_image)}
             alt={product.name}
             className="w-full h-full object-cover"
           />

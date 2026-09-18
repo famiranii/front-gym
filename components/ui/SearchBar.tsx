@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 interface ProductResult {
   id: string;
@@ -12,7 +13,6 @@ interface ProductResult {
   category_name: { String: string; Valid: boolean };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
 
 function formatPrice(n: number) {
   return n.toLocaleString("fa-IR");
@@ -36,8 +36,6 @@ export default function SearchBar() {
   // debounce fetch
   useEffect(() => {
     if (q.trim().length < 1) {
-      setResults([]);
-      setShowDropdown(false);
       return;
     }
 
@@ -171,7 +169,7 @@ export default function SearchBar() {
                       <div className="h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-muted">
                         {p.primary_image ? (
                           <img
-                            src={API_URL + p.primary_image}
+                            src={getImageUrl(p.primary_image)}
                             alt={p.name}
                             className="h-full w-full object-cover"
                           />

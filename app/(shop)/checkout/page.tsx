@@ -15,6 +15,7 @@ import OrderSummary from "@/components/featchers/check-out/OrderSummary";
 import { CartSummary } from "@/types/cartTypes";
 
 import { api } from "@/lib/api";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 function formatPrice(price: number) {
   return price.toLocaleString("fa-IR") + " تومان";
@@ -123,7 +124,7 @@ export default function CheckoutPage() {
               <div key={item.id} className="flex items-center gap-4">
                 {item.image_url && (
                   <img
-                    src={`${process.env.NEXT_PUBLIC_API_URL}${item.image_url}`}
+                    src={getImageUrl(item.image_url)}
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded-xl"
                   />

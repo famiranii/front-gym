@@ -3,6 +3,7 @@
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import PriceComponent from "@/components/ui/PriceComponent";
 import QuantityBtns from "@/components/ui/QuantityBtns";
+import { getImageUrl } from "@/lib/getImageUrl";
 import { useAppDispatch } from "@/store/hook";
 import {
   removeCartItemApi,
@@ -18,7 +19,6 @@ export default function CartItem({
 }: {
   item: CartItemType;
 }) {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const dispatch = useAppDispatch();
 
@@ -76,7 +76,7 @@ export default function CartItem({
           >
             {item.image_url ? (
               <img
-                src={apiUrl + item.image_url}
+                src={getImageUrl(item.image_url)}
                 alt={item.name}
                 className="
                   h-full

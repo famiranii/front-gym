@@ -9,6 +9,7 @@ import ConfirmModal from "@/components/ui/ConfirmModal";
 
 import { Category } from "@/types/category";
 import { toast } from "sonner";
+import { getImageUrl } from "@/lib/getImageUrl";
 
 type CategoryFormData = {
   name: string;
@@ -23,7 +24,6 @@ const defaultForm: CategoryFormData = {
 };
 
 export default function CategoriesPage() {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -238,7 +238,7 @@ export default function CategoriesPage() {
               {/* Image */}
               {cat.image_url ? (
                 <img
-                  src={apiUrl + cat.image_url}
+                  src={getImageUrl(cat.image_url)}
                   alt={cat.name}
                   className="h-10 w-10 rounded-xl object-cover"
                 />
