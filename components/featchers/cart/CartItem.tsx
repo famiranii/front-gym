@@ -19,7 +19,6 @@ export default function CartItem({
 }: {
   item: CartItemType;
 }) {
-
   const dispatch = useAppDispatch();
 
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -47,45 +46,16 @@ export default function CartItem({
 
   return (
     <>
-      <div
-        className="
-          w-full
-          rounded-2xl
-          border border-border
-          bg-card
-          p-3
-          sm:p-4
-          transition-all
-          duration-200
-          hover:shadow-sm
-        "
-      >
-        {/* ================= TOP ================= */}
+      <div className="w-full rounded-2xl border border-border bg-card p-3 transition-all duration-200 hover:shadow-sm sm:p-4">
+        {/* TOP */}
         <div className="flex gap-3 sm:gap-4">
           {/* Image */}
-          <div
-            className="
-              h-24 w-24
-              sm:h-28 sm:w-28
-              md:h-32 md:w-32
-              shrink-0
-              overflow-hidden
-              rounded-xl
-              bg-muted
-            "
-          >
+          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-muted sm:h-28 sm:w-28 md:h-32 md:w-32">
             {item.image_url ? (
               <img
                 src={getImageUrl(item.image_url)}
                 alt={item.name}
-                className="
-                  h-full
-                  w-full
-                  object-cover
-                  transition-transform
-                  duration-300
-                  hover:scale-105
-                "
+                className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center">
@@ -98,36 +68,15 @@ export default function CartItem({
 
           {/* Info */}
           <div className="min-w-0 flex-1">
-            {/* Name + Delete */}
             <div className="flex items-start justify-between gap-2">
-              <h3
-                className="
-                  line-clamp-2
-                  text-sm
-                  sm:text-base
-                  font-bold
-                  leading-6
-                  text-foreground
-                "
-              >
+              <h3 className="line-clamp-2 text-sm font-bold leading-6 text-foreground sm:text-base">
                 {item.name}
               </h3>
 
               <button
                 type="button"
                 onClick={() => setConfirmOpen(true)}
-                className="
-                  flex
-                  h-8 w-8
-                  shrink-0
-                  items-center
-                  justify-center
-                  rounded-lg
-                  text-muted-foreground
-                  transition-colors
-                  hover:bg-destructive/10
-                  hover:text-destructive
-                "
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                 aria-label="حذف محصول"
               >
                 <span className="material-symbols-outlined text-[19px]">
@@ -137,20 +86,7 @@ export default function CartItem({
             </div>
 
             {/* Variants */}
-            <div
-              className="
-                mt-2
-                flex
-                flex-wrap
-                items-center
-                gap-x-2
-                gap-y-1.5
-                text-[11px]
-                sm:text-xs
-                text-muted-foreground
-              "
-            >
-              {/* Size */}
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[11px] text-muted-foreground sm:text-xs">
               <span className="flex items-center gap-1">
                 <span>سایز:</span>
                 <span className="font-medium text-foreground">
@@ -160,19 +96,11 @@ export default function CartItem({
 
               <span className="text-border">•</span>
 
-              {/* Color */}
               <span className="flex items-center gap-1.5">
                 <span>رنگ:</span>
 
                 <span
-                  className="
-                    h-3.5
-                    w-3.5
-                    rounded-full
-                    border
-                    border-border
-                    shadow-sm
-                  "
+                  className="h-3.5 w-3.5 rounded-full border border-border shadow-sm"
                   style={{
                     backgroundColor: item.color,
                   }}
@@ -182,23 +110,10 @@ export default function CartItem({
           </div>
         </div>
 
-        {/* ================= BOTTOM ================= */}
-        <div
-          className="
-            mt-3
-            flex
-            items-center
-            justify-between
-            gap-3
-            border-t
-            border-border/60
-            pt-3
-            sm:mt-4
-            sm:pt-4
-          "
-        >
+        {/* BOTTOM */}
+        <div className="mt-3 flex flex-col gap-3 border-t border-border/60 pt-3 sm:mt-4 sm:flex-row sm:items-center sm:justify-between sm:pt-4">
           {/* Quantity */}
-          <div className="shrink-0">
+          <div className="flex shrink-0 items-center">
             <QuantityBtns
               quantity={item.quantity}
               stock={item.stock}
@@ -214,7 +129,7 @@ export default function CartItem({
           </div>
 
           {/* Price */}
-          <div className="min-w-0 text-left">
+          <div className="w-full min-w-0 text-right sm:w-auto sm:text-left">
             <PriceComponent
               price={item.price}
               final_price={item.final_price}
@@ -224,7 +139,6 @@ export default function CartItem({
         </div>
       </div>
 
-      {/* ================= CONFIRM MODAL ================= */}
       <ConfirmModal
         open={confirmOpen}
         variant="danger"

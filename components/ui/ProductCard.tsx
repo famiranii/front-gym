@@ -9,7 +9,9 @@ export default function ProductCard({ product }: { product: Product }) {
       ? product.price - (product.price * product.discount) / 100
       : product.price;
 
-  const formattedPrice = new Intl.NumberFormat("fa-IR").format(discountedPrice);
+  const formattedPrice = new Intl.NumberFormat("fa-IR").format(
+    discountedPrice,
+  );
 
   const formattedOriginalPrice = new Intl.NumberFormat("fa-IR").format(
     product.price,
@@ -19,7 +21,6 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const getFallbackRating = (id: string | number) => {
     const str = String(id);
-
     let hash = 0;
 
     for (let i = 0; i < str.length; i++) {
@@ -33,58 +34,51 @@ export default function ProductCard({ product }: { product: Product }) {
     Number.isFinite(actualRating) && actualRating > 0
       ? actualRating
       : getFallbackRating(product.id);
+
   return (
     <div
       data-product-id={product.id}
       className="
-        w-[280px] md:w-[320px]
-        h-[430px]
-        bg-card
-        rounded-2xl
-        overflow-hidden
-        border border-border/60
-        shadow-sm
-        hover:shadow-xl
-        hover:-translate-y-1
-        transition-all duration-300
-        cursor-pointer
-        flex flex-col
-        group
+        group flex h-[315px] w-[190px] cursor-pointer flex-col
+        overflow-hidden rounded-xl border border-border/60
+        bg-card shadow-sm transition-all duration-300
+        hover:-translate-y-1 hover:shadow-xl
+
+        sm:h-[430px] sm:w-[280px] sm:rounded-2xl
+        md:w-[320px]
       "
     >
       {/* Image */}
-      <div className="relative h-64 bg-muted overflow-hidden">
+      <div className="relative h-[155px] shrink-0 overflow-hidden bg-muted sm:h-64">
         {product.primary_image ? (
           <img
             src={getImageUrl(product.primary_image)}
             alt={product.name}
             className="
-              object-cover
-              w-full h-full
-              group-hover:scale-110
+              h-full w-full object-cover
               transition-transform duration-700
+              group-hover:scale-110
             "
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            <span className="material-symbols-outlined text-5xl">image</span>
+          <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+            <span className="material-symbols-outlined text-4xl sm:text-5xl">
+              image
+            </span>
           </div>
         )}
 
-        {/* Image Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
 
         {/* Discount */}
         {product.discount > 0 && (
           <span
             className="
-              absolute top-3 right-3
-              px-3 py-1.5
-              rounded-full
-              bg-destructive
-              text-destructive-foreground
-              text-xs font-bold
-              shadow-lg
+              absolute right-2 top-2 rounded-full
+              bg-destructive px-2 py-1
+              text-[9px] font-bold text-destructive-foreground
+              shadow-md
+              sm:right-3 sm:top-3 sm:px-3 sm:py-1.5 sm:text-xs
             "
           >
             {product.discount}% تخفیف
@@ -93,8 +87,8 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Inactive */}
         {!product.is_active && (
-          <div className="absolute inset-0 bg-black/55 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="px-4 py-2 rounded-xl bg-background text-foreground text-sm font-semibold shadow-lg">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/55 backdrop-blur-[2px]">
+            <span className="rounded-lg bg-background px-3 py-1.5 text-xs font-semibold text-foreground shadow-lg sm:rounded-xl sm:px-4 sm:py-2 sm:text-sm">
               ناموجود
             </span>
           </div>
@@ -102,16 +96,16 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1 flex flex-col justify-between text-right">
+      <div className="flex flex-1 flex-col justify-between p-2.5 text-right sm:p-4">
         <div>
           {/* Category + Rating */}
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-medium text-muted-foreground">
+          <div className="mb-1.5 flex items-center justify-between sm:mb-2">
+            <span className="max-w-[100px] truncate text-[9px] font-medium text-muted-foreground sm:max-w-none sm:text-xs">
               {product.category_name}
             </span>
 
-            <div className="flex items-center gap-1 text-xs">
-              <span className="material-symbols-outlined text-[15px] text-yellow-500">
+            <div className="flex shrink-0 items-center gap-0.5 text-[10px] sm:gap-1 sm:text-xs">
+              <span className="material-symbols-outlined text-[13px] text-yellow-500 sm:text-[15px]">
                 star
               </span>
 
@@ -124,36 +118,34 @@ export default function ProductCard({ product }: { product: Product }) {
           {/* Name */}
           <h3
             className="
-              text-sm md:text-base
-              font-bold
-              text-foreground
-              leading-6
               line-clamp-2
-              group-hover:text-primary
-              transition-colors
+              text-xs font-bold leading-5 text-foreground
+              transition-colors group-hover:text-primary
+
+              sm:text-sm sm:leading-6
+              md:text-base
             "
           >
             {product.name}
           </h3>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-5 pt-4 border-t border-border/60 flex items-end justify-between gap-3">
-          {/* Price */}
-          <div className="flex flex-col items-start">
-            {product.discount > 0 && (
-              <span className="text-xs text-muted-foreground line-through mb-1">
-                {formattedOriginalPrice} تومان
-              </span>
-            )}
+        {/* Price */}
+        <div className="mt-2 border-t border-border/60 pt-2 sm:mt-5 sm:pt-4">
+          {product.discount > 0 && (
+            <span className="mb-0.5 block text-[9px] text-muted-foreground line-through sm:mb-1 sm:text-xs">
+              {formattedOriginalPrice} تومان
+            </span>
+          )}
 
-            <div className="flex items-baseline gap-1">
-              <span className="text-lg font-extrabold text-foreground">
-                {formattedPrice}
-              </span>
+          <div className="flex items-baseline gap-0.5">
+            <span className="text-sm font-extrabold text-foreground sm:text-lg">
+              {formattedPrice}
+            </span>
 
-              <span className="text-[10px] text-muted-foreground">تومان</span>
-            </div>
+            <span className="text-[8px] text-muted-foreground sm:text-[10px]">
+              تومان
+            </span>
           </div>
         </div>
       </div>

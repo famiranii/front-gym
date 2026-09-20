@@ -6,33 +6,33 @@ import { usePathname } from "next/navigation";
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const count = useAppSelector((state) => state.users.me?.cart_length ?? 0);
+  const count = useAppSelector(
+    (state) => state.users.me?.cart_length ?? 0
+  );
+
   const bottomNavItems = [
     { label: "خانه", href: "/", icon: "home" },
     { label: "فروشگاه", href: "/products", icon: "grid_view" },
-    { label: "سبد", href: "/cart", icon: "shopping_bag", badge: count ?? 0 },
+    { label: "سبد", href: "/cart", icon: "shopping_bag", badge: count },
     { label: "سفارشات", href: "/orders", icon: "inventory_2" },
     { label: "پروفایل", href: "/account", icon: "person" },
   ];
+
   const isProductPage = pathname.startsWith("/product/");
 
-  if (isProductPage) {
-    return null;
-  }
+  if (isProductPage) return null;
 
   const isActive = (href: string) => {
-    // صفحه اصلی فقط روی / فعال باشد
     if (href === "/") {
       return pathname === "/";
     }
 
-    // برای صفحات دیگر و زیرصفحه‌هایشان
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   return (
-    <nav className="md:hidden fixed bottom-0 right-0 left-0 z-40 px-3 pb-3">
-      <div className="flex items-stretch bg-card border border-border rounded-2xl overflow-hidden px-2 py-1.5 gap-0">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden">
+      <div className="mx-2 mb-2 flex items-stretch overflow-hidden rounded-2xl border border-border bg-card px-1.5 py-1.5 shadow-lg">
         {bottomNavItems.map((item) => {
           const active = isActive(item.href);
 
@@ -40,20 +40,20 @@ export default function BottomNav() {
             <Link
               key={item.label}
               href={item.href}
-              className={`relative flex-1 flex flex-col items-center justify-center gap-[3px] py-1.5 rounded-xl text-[11px] transition-colors ${
+              className={`relative flex flex-1 flex-col items-center justify-center gap-[3px] rounded-xl py-1.5 text-[11px] transition-colors ${
                 active
-                  ? "text-primary bg-primary/10 font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "bg-primary/10 font-medium text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               <span className="material-symbols-outlined text-[21px]">
                 {item.icon}
               </span>
 
-              {item.label}
+              <span>{item.label}</span>
 
-              {item.badge && item.badge > 0 && (
-                <span className="absolute top-0.5 left-4 min-w-[16px] h-4 bg-destructive text-destructive-foreground text-[10px] font-semibold rounded-full flex items-center justify-center px-1 border-2 border-card">
+              {item.badge!==undefined && item.badge > 0 && (
+                <span className="absolute left-1/2 top-0.5 ml-3 flex h-4 min-w-4 -translate-x-1/2 items-center justify-center rounded-full border-2 border-card bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
                   {item.badge}
                 </span>
               )}

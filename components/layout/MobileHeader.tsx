@@ -13,10 +13,19 @@ export default function MobileHeader() {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-40 flex h-[52px] w-full items-center justify-between border-b border-border bg-card px-2 md:hidden">
-      {/* SearchBar overlays the header when open */}
+    <header
+      className="
+        sticky top-0 z-40
+        flex h-[52px] w-full
+        items-center justify-between
+        border-b border-border
+        bg-card
+        px-2
+        md:hidden
+      "
+    >
       {/* Back */}
-      <div className="w-9">
+      <div className="w-9 shrink-0">
         <button
           type="button"
           onClick={() => router.back()}
@@ -28,14 +37,18 @@ export default function MobileHeader() {
           </span>
         </button>
       </div>
-      <div className="flex items-center gap-1 w-60">
-          <SearchBar />
+
+      {/* Search */}
+      <div className="mx-2 flex min-w-0 flex-1 justify-center">
+        <SearchBar />
       </div>
+
+      {/* Logo */}
       <h1
-        className={`${vazir.className} text-xl font-black text-gray-400 tracking-tight`}
+        className={`${vazir.className} shrink-0 text-xl font-black tracking-tight text-gray-400`}
       >
         چهل<span className="text-[#FF9F0A]">تیکه</span>
-      </h1>{" "}
+      </h1>
     </header>
   );
 }
