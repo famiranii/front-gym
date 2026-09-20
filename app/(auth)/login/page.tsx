@@ -11,6 +11,7 @@ import { api } from "@/lib/api";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Vazirmatn } from "next/font/google";
+import LoginMessageBanner from "@/components/featchers/login/LoginMessageBanner";
 const vazir = Vazirmatn({
   subsets: ["arabic"],
   weight: ["400", "700", "900"],
@@ -58,6 +59,7 @@ export default function LoginPage() {
         !redirect.startsWith("/register") &&
         !redirect.startsWith("/login")
       ) {
+        router.replace(redirect); // ← اینو اضافه کن
       } else {
         router.replace("/");
       }
@@ -83,6 +85,7 @@ export default function LoginPage() {
       </div>
 
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-white/15">
+        <LoginMessageBanner />
         <div className="text-center mb-8">
           <h1
             className={`${vazir.className} text-2xl font-black text-gray-400 tracking-tight`}

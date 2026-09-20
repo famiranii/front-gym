@@ -1,5 +1,4 @@
 function getBaseUrl() {
-  // Next.js Server
   if (typeof window === "undefined") {
     const url = process.env.INTERNAL_API_URL;
 
@@ -10,7 +9,6 @@ function getBaseUrl() {
     return url;
   }
 
-  // Browser / Client Component
   const url = process.env.NEXT_PUBLIC_API_URL;
 
   if (!url) {
@@ -24,6 +22,28 @@ type RequestOptions = RequestInit & {
   cookie?: string;
   skipAuthRedirect?: boolean;
 };
+
+let refreshPromise: Promise<boolean> | null = null;
+
+async function refreshAccessToken(): Promise<boolean> {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  if (!refreshPromise) {
+    refreshPromise = fetch(`${getBaseUrl()}/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((res) => res.ok)
+      .catch(() => false)
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+
+  return refreshPromise;
+}
 
 async function request<T>(
   endpoint: string,
@@ -40,7 +60,6 @@ async function request<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  // فقط برای Server-Side
   if (cookie) {
     headers.set("Cookie", cookie);
   }
@@ -51,16 +70,28 @@ async function request<T>(
     headers,
   });
 
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-
+  if (res.status === 401) {
     if (
-      error.error === "access token is required" &&
+      typeof window !== "undefined" &&
       !skipAuthRedirect &&
-      typeof window !== "undefined"
+      endpoint !== "/auth/refresh"
     ) {
+      const refreshed = await refreshAccessToken();
+
+      if (refreshed) {
+        return request<T>(endpoint, options);
+      }
+
       window.location.href = "/login";
     }
+
+    const error = await res.json().catch(() => ({}));
+
+    throw new Error(error.message || error.error || "Unauthorized");
+  }
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
 
     throw new Error(
       error.message ||
@@ -77,11 +108,7 @@ async function request<T>(
 }
 
 export const api = {
-  get: <T>(
-    url: string,
-    cookie?: string,
-    skipAuthRedirect = false,
-  ) =>
+  get: <T>(url: string, cookie?: string, skipAuthRedirect = false) =>
     request<T>(url, {
       method: "GET",
       cookie,
@@ -142,11 +169,7 @@ export const api = {
             : undefined,
     }),
 
-  delete: <T>(
-    url: string,
-    cookie?: string,
-    skipAuthRedirect = false,
-  ) =>
+  delete: <T>(url: string, cookie?: string, skipAuthRedirect = false) =>
     request<T>(url, {
       method: "DELETE",
       cookie,
