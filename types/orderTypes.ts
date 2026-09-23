@@ -2,13 +2,19 @@ export type Order = {
   id: string;
   user_id: string;
   status: string;
+
   shipping_cost: number;
   total_price: number;
+
+  discount_code: string | null;
+  discount_amount: number;
+
   address_title: string | null;
   address_province: string | null;
   address_city: string | null;
   address_detail: string | null;
   address_postal_code: string | null;
+
   created_at: string;
   user_phone: number;
 };
@@ -26,6 +32,7 @@ export type OrderItem = {
   color: string;
   image_url: string | null;
 };
+
 export type OrderDetail = {
   order: Order;
   items: OrderItem[];

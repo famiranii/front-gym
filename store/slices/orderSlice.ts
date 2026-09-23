@@ -18,7 +18,10 @@ const initialState: OrderState = {
 
 export const createOrderApi = createAsyncThunk<
   Order,
-  { address_id: string },
+  {
+    address_id: string;
+    discount_code?: string;
+  },
   { rejectValue: string }
 >("order/create", async (body, { rejectWithValue }) => {
   try {

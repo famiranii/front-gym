@@ -16,10 +16,20 @@ import { CartSummary } from "@/types/cartTypes";
 
 import { api } from "@/lib/api";
 import { getImageUrl } from "@/lib/getImageUrl";
+import DiscountCode from "@/components/featchers/check-out/Discount";
 
 function formatPrice(price: number) {
   return price.toLocaleString("fa-IR") + " تومان";
 }
+
+type DiscountResult = {
+  valid: boolean;
+  code: string;
+  discount_type: "percentage" | "fixed";
+  discount_value: number;
+  discount_amount: number;
+  final_subtotal: number;
+};
 
 export default function CheckoutPage() {
   const dispatch = useAppDispatch();
@@ -39,7 +49,12 @@ export default function CheckoutPage() {
     currentOrder,
   } = useAppSelector((state) => state.order);
 
+  const [appliedDiscount, setAppliedDiscount] = useState<DiscountResult | null>(
+    null,
+  );
+
   const [selectedAddress, setSelectedAddress] = useState<string>("");
+
   const [shippingCost, setShippingCost] = useState<number>(0);
 
   const defaultAddress = addresses.find((addr) => addr.is_default);
@@ -76,47 +91,85 @@ export default function CheckoutPage() {
     router.push(`/orders/${currentOrder.id}`);
   }, [currentOrder, router]);
 
+  /*
+   * مبلغ کالاها بعد از تخفیف خود محصول
+   */
   const itemsTotal = cartItems.reduce(
     (sum, item) => sum + item.final_price * item.quantity,
     0,
   );
 
+  /*
+   * مبلغ تخفیف کد تخفیف
+   */
+  const discountAmount = appliedDiscount?.discount_amount ?? 0;
+
+  /*
+   * مبلغ کالاها بعد از اعمال کد تخفیف
+   */
+  const finalItemsTotal = Math.max(itemsTotal - discountAmount, 0);
+
   const summary: CartSummary = {
+    /*
+     * مبلغ اصلی کالاها
+     */
     total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+
+    /*
+     * تخفیف خود محصولات
+     */
     discount: cartItems.reduce(
       (sum, item) => sum + (item.price - item.final_price) * item.quantity,
       0,
     ),
-    payable: itemsTotal,
+
+    /*
+     * مبلغ قابل پرداخت کالاها بعد از
+     * تخفیف محصول + کد تخفیف
+     */
+    payable: finalItemsTotal,
+
     count: cartItems.reduce((sum, item) => sum + item.quantity, 0),
   };
 
+  const handleDiscountValidated = (result: DiscountResult | null) => {
+    setAppliedDiscount(result);
+  };
+
   const handleSubmit = () => {
-    if (!currentSelectedAddress || orderLoading) return;
+    if (!currentSelectedAddress || orderLoading) {
+      return;
+    }
 
     dispatch(
       createOrderApi({
         address_id: currentSelectedAddress,
+
+        /*
+         * کد تخفیف را همراه سفارش می‌فرستیم.
+         */
+        discount_code: appliedDiscount?.code ?? "",
       }),
     );
   };
 
   if (cartItems.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-muted-foreground">سبد خرید شما خالی است</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8" dir="rtl">
-      <h1 className="text-2xl font-bold mb-8 text-foreground">تکمیل سفارش</h1>
+    <div className="mx-auto max-w-4xl px-4 py-8" dir="rtl">
+      <h1 className="mb-8 text-2xl font-bold text-foreground">تکمیل سفارش</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 space-y-4">
-          <section className="bg-card rounded-2xl border border-border p-5 shadow-sm space-y-4">
-            <h2 className="text-lg font-extrabold text-foreground border-b border-border pb-2">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="space-y-4 md:col-span-2">
+          {/* کالاها */}
+          <section className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <h2 className="border-b border-border pb-2 text-lg font-extrabold text-foreground">
               کالاها
             </h2>
 
@@ -126,7 +179,7 @@ export default function CheckoutPage() {
                   <img
                     src={getImageUrl(item.image_url)}
                     alt={item.name}
-                    className="w-16 h-16 object-cover rounded-xl"
+                    className="h-16 w-16 rounded-xl object-cover"
                   />
                 )}
 
@@ -138,15 +191,22 @@ export default function CheckoutPage() {
                   </p>
                 </div>
 
-                <p className="font-bold text-sm text-primary">
+                <p className="text-sm font-bold text-primary">
                   {formatPrice(item.final_price * item.quantity)}
                 </p>
               </div>
             ))}
           </section>
 
+          {/* کد تخفیف */}
+          <DiscountCode
+            subtotal={itemsTotal}
+            onValidated={handleDiscountValidated}
+          />
+
+          {/* آدرس */}
           {addressLoading ? (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               در حال بارگذاری آدرس‌ها...
             </p>
           ) : (
@@ -159,12 +219,15 @@ export default function CheckoutPage() {
           )}
         </div>
 
+        {/* خلاصه سفارش */}
         <OrderSummary
           summary={summary}
           shippingCost={shippingCost}
           selectedAddressId={currentSelectedAddress}
           loading={orderLoading}
           error={orderError}
+          discountAmount={appliedDiscount?.discount_amount ?? 0}
+          discountCode={appliedDiscount?.code}
           onSubmit={handleSubmit}
         />
       </div>
