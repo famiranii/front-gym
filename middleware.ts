@@ -6,6 +6,7 @@ const PROTECTED_ROUTES = [
   "/profile",
   "/addresses",
   "/checkout",
+  "/account",
 ];
 
 export async function middleware(req: NextRequest) {
@@ -30,20 +31,30 @@ export async function middleware(req: NextRequest) {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refresh`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh_token: refreshToken }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          refresh_token: refreshToken,
+        }),
       });
 
-      if (!res.ok) return redirectToLogin(req, pathname);
+      if (!res.ok) {
+        return redirectToLogin(req, pathname);
+      }
 
       const data = await res.json();
+
       const response = NextResponse.next();
+
       response.cookies.set("access_token", data.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 60 * 15, // 15 دقیقه
+        maxAge: 60 * 15,
+        path: "/",
       });
+
       return response;
     } catch {
       return redirectToLogin(req, pathname);
@@ -55,8 +66,11 @@ export async function middleware(req: NextRequest) {
 
 function redirectToLogin(req: NextRequest, pathname: string) {
   const loginUrl = new URL("/login", req.url);
-  loginUrl.searchParams.set("message", "برای ادامه باید وارد حساب کاربری شوید");
-  loginUrl.searchParams.set("redirect", pathname);
+
+  loginUrl.search = `message=${encodeURIComponent(
+    "برای ادامه باید وارد حساب کاربری شوید",
+  )}&redirect=${pathname.replace(/^\/+/, "")}`;
+
   return NextResponse.redirect(loginUrl);
 }
 
@@ -67,5 +81,6 @@ export const config = {
     "/profile/:path*",
     "/addresses/:path*",
     "/checkout/:path*",
+    "/account/:path*",
   ],
 };

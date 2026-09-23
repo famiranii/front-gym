@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Vazirmatn } from "next/font/google";
 import LoginMessageBanner from "@/components/featchers/login/LoginMessageBanner";
+
 const vazir = Vazirmatn({
   subsets: ["arabic"],
   weight: ["400", "700", "900"],
@@ -26,9 +27,18 @@ type LoginSchema = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-
-  const redirect = searchParams.get("redirect");
   const router = useRouter();
+
+  const redirectParam = searchParams.get("redirect");
+
+  const redirect =
+    redirectParam &&
+    redirectParam.startsWith("/") &&
+    !redirectParam.startsWith("//") &&
+    !redirectParam.startsWith("/login") &&
+    !redirectParam.startsWith("/register")
+      ? redirectParam
+      : "/";
 
   const {
     register,
@@ -41,7 +51,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginSchema) => {
     try {
-      const res = await api.post<{
+      await api.post<{
         session_id: string;
         user: {
           id: string;
@@ -53,18 +63,14 @@ export default function LoginPage() {
         phone: data.phone,
         password: data.password,
       });
-      if (
-        redirect &&
-        redirect.startsWith("/") &&
-        !redirect.startsWith("/register") &&
-        !redirect.startsWith("/login")
-      ) {
-        router.replace(redirect); // ← اینو اضافه کن
-      } else {
-        router.replace("/");
-      }
+
+      // بعد از لاگین، دقیقاً به صفحه‌ای که کاربر از آن آمده برگرد
+      router.replace(redirect);
+      router.refresh();
     } catch {
-      setError("root", { message: "شماره موبایل یا رمز عبور اشتباه است" });
+      setError("root", {
+        message: "شماره موبایل یا رمز عبور اشتباه است",
+      });
     }
   };
 
@@ -81,23 +87,31 @@ export default function LoginPage() {
           className="object-cover scale-105 blur-sm brightness-50"
           priority
         />
+
         <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/40 to-[#6b705c]/40" />
       </div>
 
       <div className="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-white/15">
         <LoginMessageBanner />
+
         <div className="text-center mb-8">
           <h1
             className={`${vazir.className} text-2xl font-black text-gray-400 tracking-tight`}
           >
             چهل<span className="text-[#FF9F0A]">تیکه</span>
           </h1>
+
           <div className="w-10 h-0.5 bg-white/40 mx-auto mt-2 rounded-full" />
         </div>
 
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-white mb-1">ورود به حساب</h2>
-          <p className="text-sm text-white/60">خوش برگشتی</p>
+          <h2 className="text-xl font-bold text-white mb-1">
+            ورود به حساب
+          </h2>
+
+          <p className="text-sm text-white/60">
+            خوش برگشتی
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">

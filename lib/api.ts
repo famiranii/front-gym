@@ -31,7 +31,7 @@ async function refreshAccessToken(): Promise<boolean> {
   }
 
   if (!refreshPromise) {
-    refreshPromise = fetch(`${getBaseUrl()}/auth/refresh`, {
+    refreshPromise = fetch(`${getBaseUrl()}/refresh`, {
       method: "POST",
       credentials: "include",
     })
@@ -74,7 +74,7 @@ async function request<T>(
     if (
       typeof window !== "undefined" &&
       !skipAuthRedirect &&
-      endpoint !== "/auth/refresh"
+      endpoint !== "/refresh"
     ) {
       const refreshed = await refreshAccessToken();
 
@@ -82,7 +82,7 @@ async function request<T>(
         return request<T>(endpoint, options);
       }
 
-      window.location.href = "/login";
+      // window.location.href = "/login";
     }
 
     const error = await res.json().catch(() => ({}));

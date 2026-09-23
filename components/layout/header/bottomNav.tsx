@@ -1,19 +1,32 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/store/hook";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function BottomNav() {
   const pathname = usePathname();
+
   const count = useAppSelector(
     (state) => state.users.me?.cart_length ?? 0
   );
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const bottomNavItems = [
     { label: "خانه", href: "/", icon: "home" },
     { label: "فروشگاه", href: "/products", icon: "grid_view" },
-    { label: "سبد", href: "/cart", icon: "shopping_bag", badge: count },
+    {
+      label: "سبد",
+      href: "/cart",
+      icon: "shopping_bag",
+      badge: mounted ? count : 0,
+    },
     { label: "سفارشات", href: "/orders", icon: "inventory_2" },
     { label: "پروفایل", href: "/account", icon: "person" },
   ];
@@ -52,7 +65,7 @@ export default function BottomNav() {
 
               <span>{item.label}</span>
 
-              {item.badge!==undefined && item.badge > 0 && (
+              {item.badge !== undefined && item.badge > 0 && (
                 <span className="absolute left-1/2 top-0.5 ml-3 flex h-4 min-w-4 -translate-x-1/2 items-center justify-center rounded-full border-2 border-card bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
                   {item.badge}
                 </span>
