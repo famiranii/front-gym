@@ -70,10 +70,10 @@ export async function generateMetadata({
   }
 }
 
-export default async function ProductPage({ params, searchParams }: Props) {
+export default async function ProductPage({ searchParams }: Props) {
   const { tab } = await searchParams;
   const { id } = await searchParams;
-  const url = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const url = process.env.NEXT_PUBLIC_SITE_URL;
   let product: Product;
 
   try {

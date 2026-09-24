@@ -18,53 +18,30 @@ export async function middleware(req: NextRequest) {
 
   if (!isProtected) return NextResponse.next();
 
-  const accessToken = req.cookies.get("access_token")?.value;
-  const refreshToken = req.cookies.get("refresh_token")?.value;
+  const url = `${process.env.INTERNAL_API_URL}/users/me`;
+  console.log("Middleware URL:", url);
+  console.log("Cookie:", req.headers.get("cookie"));
 
-  // نه access نه refresh — redirect به لاگین
-  if (!accessToken && !refreshToken) {
-    return redirectToLogin(req, pathname);
-  }
+  try {
+    const res = await fetch(url, {
+      headers: {
+        Cookie: req.headers.get("cookie") ?? "",
+      },
+    });
 
-  // access نیست ولی refresh هست — سعی کن refresh کنی
-  if (!accessToken && refreshToken) {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          refresh_token: refreshToken,
-        }),
-      });
+    console.log("Response status:", res.status);
 
-      if (!res.ok) {
-        return redirectToLogin(req, pathname);
-      }
-
-      const data = await res.json();
-
-      const response = NextResponse.next();
-
-      response.cookies.set("access_token", data.access_token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 15,
-        path: "/",
-      });
-
-      return response;
-    } catch {
+    if (!res.ok) {
       return redirectToLogin(req, pathname);
     }
+
+    return NextResponse.next();
+  } catch (e) {
+    console.log("Fetch error:", e);
+    return redirectToLogin(req, pathname);
   }
-
-  return NextResponse.next();
 }
-
-function redirectToLogin(req: NextRequest, pathname: string) {
+function redirectToLogin(req: NextRequest, pathname: string): NextResponse {
   const loginUrl = new URL("/login", req.url);
 
   loginUrl.search = `message=${encodeURIComponent(

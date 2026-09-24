@@ -110,6 +110,24 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+            <div>
+              <div className="w-60 h-60 border">
+                <a
+                  referrerPolicy="origin"
+                  target="_blank"
+                  href="https://trustseal.enamad.ir/?id=7770579&Code=uSiFyUQyFt97fa8gDF9gVzVp7W8gq7Fs"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    referrerPolicy="origin"
+                    src="https://trustseal.enamad.ir/logo.aspx?id=7770579&Code=uSiFyUQyFt97fa8gDF9gVzVp7W8gq7Fs"
+                    alt="اینماد"
+                    style={{ cursor: "pointer" }}
+                    {...{ code: "uSiFyUQyFt97fa8gDF9gVzVp7W8gq7Fs" }}
+                  />
+                </a>
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-4">
             <nav aria-label="لینک‌های فروشگاه">
@@ -221,21 +239,24 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-secondary-foreground/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 py-4 sm:flex-row">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-4 sm:flex-row">
           <p className="text-center text-xs text-secondary-foreground/50 sm:text-right">
             © {currentYear} چهلتیکه — تمامی حقوق محفوظ است.
           </p>
 
-          <p className="text-xs text-secondary-foreground/50">
-            ساخته‌شده با ❤️ توسط{" "}
-            <a
-              href="https://github.com/famiranii"
-              target="_blank"
-              className="hover:text-secondary-foreground transition-colors"
-            >
-              فرهاد امیرانی
-            </a>
-          </p>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-secondary-foreground/50">
+              ساخته‌شده با ❤️ توسط{" "}
+              <a
+                href="https://github.com/famiranii"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-secondary-foreground"
+              >
+                فرهاد امیرانی
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>

@@ -60,7 +60,8 @@ export default function ProfileMenu() {
 
       setShowLogoutModal(false);
 
-      router.push("/");
+      router.replace("/");
+      router.refresh();
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
