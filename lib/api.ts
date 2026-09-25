@@ -71,6 +71,7 @@ async function request<T>(
   });
 
   if (res.status === 401) {
+    console.log("API 401:", endpoint, await res.clone().text());
     if (
       typeof window !== "undefined" &&
       !skipAuthRedirect &&

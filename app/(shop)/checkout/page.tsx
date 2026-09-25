@@ -4,19 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAppDispatch, useAppSelector } from "@/store/hook";
-
 import { fetchAddresses } from "@/store/slices/addressSlice";
 import { createOrderApi } from "@/store/slices/orderSlice";
 import { getCartApi } from "@/store/slices/cartSlice";
 
 import AddressList from "@/components/featchers/check-out/AddressList";
 import OrderSummary from "@/components/featchers/check-out/OrderSummary";
+import DiscountCode from "@/components/featchers/check-out/Discount";
 
 import { CartSummary } from "@/types/cartTypes";
-
 import { api } from "@/lib/api";
 import { getImageUrl } from "@/lib/getImageUrl";
-import DiscountCode from "@/components/featchers/check-out/Discount";
 
 function formatPrice(price: number) {
   return price.toLocaleString("fa-IR") + " تومان";
@@ -33,15 +31,14 @@ type DiscountResult = {
 
 export default function CheckoutPage() {
   const dispatch = useAppDispatch();
-  const router = useRouter();
 
   const me = useAppSelector((state) => state.users.me);
-
   const cartItems = useAppSelector((state) => state.cart.items);
 
-  const { addresses, loading: addressLoading } = useAppSelector(
-    (state) => state.address,
-  );
+  const {
+    addresses,
+    loading: addressLoading,
+  } = useAppSelector((state) => state.address);
 
   const {
     loading: orderLoading,
@@ -49,26 +46,33 @@ export default function CheckoutPage() {
     currentOrder,
   } = useAppSelector((state) => state.order);
 
-  const [appliedDiscount, setAppliedDiscount] = useState<DiscountResult | null>(
-    null,
-  );
+  const [appliedDiscount, setAppliedDiscount] =
+    useState<DiscountResult | null>(null);
 
   const [selectedAddress, setSelectedAddress] = useState<string>("");
-
   const [shippingCost, setShippingCost] = useState<number>(0);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const defaultAddress = addresses.find((addr) => addr.is_default);
 
-  const currentSelectedAddress = selectedAddress || defaultAddress?.id || "";
+  const currentSelectedAddress =
+    selectedAddress || defaultAddress?.id || "";
 
+  /*
+   * دریافت آدرس‌های کاربر
+   */
   useEffect(() => {
     if (!me?.id) return;
 
     dispatch(fetchAddresses(me.id));
   }, [me?.id, dispatch]);
 
+  /*
+   * دریافت سبد خرید و هزینه ارسال
+   */
   useEffect(() => {
-    const getCartAndCost = async () => {
+    const getCartAndShippingCost = async () => {
       try {
         const shippingResponse = await api.get<{ cost: number }>(
           "/shipping-cost",
@@ -78,92 +82,192 @@ export default function CheckoutPage() {
 
         setShippingCost(shippingResponse.cost);
       } catch (error) {
-        console.error("Failed to get cart or shipping cost:", error);
+        console.error(
+          "Failed to get cart or shipping cost:",
+          error,
+        );
       }
     };
 
-    getCartAndCost();
+    getCartAndShippingCost();
   }, [dispatch]);
 
+  /*
+   * بعد از ساخته شدن Order،
+   * پرداخت زرین‌پال را شروع می‌کنیم.
+   *
+   * اگر payment API شما بعداً redirect مستقیم بدهد،
+   * این بخش باید بر اساس response همان API تنظیم شود.
+   */
   useEffect(() => {
-    if (!currentOrder) return;
+    if (!currentOrder?.id || !paymentLoading) {
+      return;
+    }
 
-    router.push(`/orders/${currentOrder.id}`);
-  }, [currentOrder, router]);
+    const createPayment = async () => {
+      try {
+        setPaymentError(null);
+
+        const response = await api.post<{
+          payment_url?: string;
+          url?: string;
+        }>("/api/payment/zarinpal/request", {
+          order_id: currentOrder.id,
+        });
+
+        const paymentUrl =
+          response.payment_url ?? response.url;
+
+        if (!paymentUrl) {
+          throw new Error(
+            "آدرس پرداخت از سرور دریافت نشد.",
+          );
+        }
+
+        window.location.href = paymentUrl;
+      } catch (error) {
+        console.error("Payment creation failed:", error);
+
+        setPaymentError(
+          "خطا در ایجاد پرداخت. لطفاً دوباره تلاش کنید.",
+        );
+
+        setPaymentLoading(false);
+      }
+    };
+
+    createPayment();
+  }, [currentOrder, paymentLoading]);
 
   /*
    * مبلغ کالاها بعد از تخفیف خود محصول
    */
   const itemsTotal = cartItems.reduce(
-    (sum, item) => sum + item.final_price * item.quantity,
+    (sum, item) =>
+      sum + item.final_price * item.quantity,
     0,
   );
 
   /*
    * مبلغ تخفیف کد تخفیف
    */
-  const discountAmount = appliedDiscount?.discount_amount ?? 0;
+  const discountAmount =
+    appliedDiscount?.discount_amount ?? 0;
 
   /*
-   * مبلغ کالاها بعد از اعمال کد تخفیف
+   * مبلغ کالاها بعد از تخفیف محصول + کد تخفیف
    */
-  const finalItemsTotal = Math.max(itemsTotal - discountAmount, 0);
+  const finalItemsTotal = Math.max(
+    itemsTotal - discountAmount,
+    0,
+  );
 
   const summary: CartSummary = {
     /*
-     * مبلغ اصلی کالاها
+     * قیمت اصلی کالاها
      */
-    total: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    total: cartItems.reduce(
+      (sum, item) =>
+        sum + item.price * item.quantity,
+      0,
+    ),
 
     /*
      * تخفیف خود محصولات
      */
     discount: cartItems.reduce(
-      (sum, item) => sum + (item.price - item.final_price) * item.quantity,
+      (sum, item) =>
+        sum +
+        (item.price - item.final_price) *
+          item.quantity,
       0,
     ),
 
     /*
-     * مبلغ قابل پرداخت کالاها بعد از
-     * تخفیف محصول + کد تخفیف
+     * مبلغ قابل پرداخت کالاها
      */
     payable: finalItemsTotal,
 
-    count: cartItems.reduce((sum, item) => sum + item.quantity, 0),
+    /*
+     * تعداد کل کالاها
+     */
+    count: cartItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0,
+    ),
   };
 
-  const handleDiscountValidated = (result: DiscountResult | null) => {
+  const handleDiscountValidated = (
+    result: DiscountResult | null,
+  ) => {
     setAppliedDiscount(result);
   };
 
   const handleSubmit = () => {
-    if (!currentSelectedAddress || orderLoading) {
+    if (!currentSelectedAddress) {
       return;
     }
 
+    if (orderLoading || paymentLoading) {
+      return;
+    }
+
+    if (!me?.id) {
+      setPaymentError(
+        "ابتدا وارد حساب کاربری خود شوید.",
+      );
+      return;
+    }
+
+    setPaymentError(null);
+    setPaymentLoading(true);
+
+    /*
+     * فقط Order را ایجاد می‌کنیم.
+     *
+     * بعد از موفقیت createOrderApi،
+     * currentOrder پر می‌شود و useEffect بالا
+     * درخواست پرداخت زرین‌پال را ارسال می‌کند.
+     */
     dispatch(
       createOrderApi({
         address_id: currentSelectedAddress,
-
-        /*
-         * کد تخفیف را همراه سفارش می‌فرستیم.
-         */
-        discount_code: appliedDiscount?.code ?? "",
+        discount_code:
+          appliedDiscount?.code ?? "",
       }),
     );
   };
 
+  /*
+   * سبد خالی
+   */
   if (cartItems.length === 0) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-muted-foreground">سبد خرید شما خالی است</p>
+      <div
+        className="flex min-h-screen items-center justify-center"
+        dir="rtl"
+      >
+        <p className="text-muted-foreground">
+          سبد خرید شما خالی است
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8" dir="rtl">
-      <h1 className="mb-8 text-2xl font-bold text-foreground">تکمیل سفارش</h1>
+    <div
+      className="mx-auto max-w-4xl px-4 py-8"
+      dir="rtl"
+    >
+      <h1 className="mb-8 text-2xl font-bold text-foreground">
+        تکمیل سفارش
+      </h1>
+
+      {paymentError && (
+        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {paymentError}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="space-y-4 md:col-span-2">
@@ -174,7 +278,10 @@ export default function CheckoutPage() {
             </h2>
 
             {cartItems.map((item) => (
-              <div key={item.id} className="flex items-center gap-4">
+              <div
+                key={item.id}
+                className="flex items-center gap-4"
+              >
                 {item.image_url && (
                   <img
                     src={getImageUrl(item.image_url)}
@@ -184,15 +291,21 @@ export default function CheckoutPage() {
                 )}
 
                 <div className="flex-1">
-                  <p className="font-semibold text-foreground">{item.name}</p>
+                  <p className="font-semibold text-foreground">
+                    {item.name}
+                  </p>
 
                   <p className="text-sm text-muted-foreground">
-                    سایز: {item.label} | تعداد: {item.quantity}
+                    سایز: {item.label} | تعداد:{" "}
+                    {item.quantity}
                   </p>
                 </div>
 
                 <p className="text-sm font-bold text-primary">
-                  {formatPrice(item.final_price * item.quantity)}
+                  {formatPrice(
+                    item.final_price *
+                      item.quantity,
+                  )}
                 </p>
               </div>
             ))}
@@ -224,9 +337,11 @@ export default function CheckoutPage() {
           summary={summary}
           shippingCost={shippingCost}
           selectedAddressId={currentSelectedAddress}
-          loading={orderLoading}
+          loading={
+            orderLoading || paymentLoading
+          }
           error={orderError}
-          discountAmount={appliedDiscount?.discount_amount ?? 0}
+          discountAmount={discountAmount}
           discountCode={appliedDiscount?.code}
           onSubmit={handleSubmit}
         />
